@@ -1,3 +1,6 @@
+// true: use the local mock data in src/data. false: use the backend API.
+export const USE_MOCK_DATA = false;
+
 export const API_BASE_URL = (
   process.env.NEXT_PUBLIC_API_URL ?? 'https://clinicaipoweredsystem.runasp.net'
 ).replace(/\/+$/, '');
@@ -167,6 +170,7 @@ export function getAllProductImages() {
   return getAllPages((pageNumber) => getProductImages({ pageNumber, pageSize: 200 }));
 }
 
-export function createContactMessage(message: ContactMessage) {
+export async function createContactMessage(message: ContactMessage) {
+  if (USE_MOCK_DATA) return null;
   return apiPost<unknown>('/api/v1/ContactUs/Create', message, { cache: 'no-store' });
 }

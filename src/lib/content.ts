@@ -8,6 +8,7 @@ import {
   getCertifications,
   getExhibitions,
   getProductById,
+  USE_MOCK_DATA,
   type ApiProduct,
   type ApiProductImage,
 } from '@/lib/api';
@@ -28,7 +29,18 @@ export type Exhibition = {
   image: string | null;
 };
 
+function logApiFailure(what: string, error: unknown) {
+  console.error(`[api] ${what}: ${error instanceof Error ? error.message : String(error)}`);
+}
+
+const mockCertificates = (): Certificate[] => fallbackCertificates.map((cert) => ({ id: cert.name, ...cert }));
+
+const mockExhibitions = (): Exhibition[] =>
+  fallbackExhibitions.map((event) => ({ id: event.name, ...event, year: String(event.year) }));
+
 export async function loadCertificates(): Promise<Certificate[]> {
+  if (USE_MOCK_DATA) return mockCertificates();
+
   try {
     const { data } = await getCertifications();
     return data.map((cert) => ({
@@ -38,12 +50,14 @@ export async function loadCertificates(): Promise<Certificate[]> {
       image: apiAssetUrl(cert.certificationUrl),
     }));
   } catch (error) {
-    console.error('Failed to load certifications from API, using local data.', error);
-    return fallbackCertificates.map((cert) => ({ id: cert.name, ...cert }));
+    logApiFailure('Certifications failed, using local data', error);
+    return mockCertificates();
   }
 }
 
 export async function loadExhibitions(): Promise<Exhibition[]> {
+  if (USE_MOCK_DATA) return mockExhibitions();
+
   try {
     const { data } = await getExhibitions();
     return data.map((event) => ({
@@ -54,8 +68,8 @@ export async function loadExhibitions(): Promise<Exhibition[]> {
       image: apiAssetUrl(event.exhibitionUrl),
     }));
   } catch (error) {
-    console.error('Failed to load exhibitions from API, using local data.', error);
-    return fallbackExhibitions.map((event) => ({ id: event.name, ...event, year: String(event.year) }));
+    logApiFailure('Exhibitions failed, using local data', error);
+    return mockExhibitions();
   }
 }
 
@@ -122,11 +136,13 @@ const localCatalog = (): ProductCatalog => ({
 });
 
 export const loadProductCatalog = cache(async (): Promise<ProductCatalog> => {
+  if (USE_MOCK_DATA) return localCatalog();
+
   try {
     const [apiProducts, images] = await Promise.all([
       getAllProducts(),
       getAllProductImages().catch((error) => {
-        console.error('Failed to load product images from API.', error);
+        logApiFailure('Product images failed', error);
         return [] as ApiProductImage[];
       }),
     ]);
@@ -136,7 +152,7 @@ export const loadProductCatalog = cache(async (): Promise<ProductCatalog> => {
     const categories = [...new Map(products.map((p) => [p.category, { id: p.category, label: p.categoryLabel }])).values()];
     return { categories, products };
   } catch (error) {
-    console.error('Failed to load products from API, using local data.', error);
+    logApiFailure('Products failed, using local data', error);
     return localCatalog();
   }
 });
@@ -150,7 +166,7 @@ export async function loadProduct(slug: string) {
     const details = fromApi(await getProductById(product.id), []);
     return { ...product, ...details, slug: product.slug, images: product.images };
   } catch (error) {
-    console.error(`Failed to load product ${product.id} from API.`, error);
+    logApiFailure(`Product ${product.id} failed`, error);
     return product;
   }
 }
