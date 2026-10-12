@@ -11,7 +11,9 @@ import { SectionHeading } from '@/components/ui/section-heading';
 import { siteConfig } from '@/config/site';
 import { packingSizes } from '@/data/products';
 import { loadProduct, loadProductCatalog } from '@/lib/content';
-import { whatsappLink } from '@/lib/utils';
+import { cn, whatsappLink } from '@/lib/utils';
+
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
@@ -91,12 +93,35 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
               <h2 className="mt-8 text-sm font-semibold">Packing options</h2>
               <ul className="mt-3 flex flex-wrap gap-2">
-                {packingSizes.map((size) => (
+                {(product.packing ?? packingSizes).map((size) => (
                   <li key={size} className="rounded-full border border-ink/10 px-4 py-2 text-sm font-medium">
                     {size}
                   </li>
                 ))}
               </ul>
+
+              {product.harvestMonths && (
+                <>
+                  <h2 className="mt-8 text-sm font-semibold">Harvest season</h2>
+                  <ol className="mt-3 grid grid-cols-6 gap-1.5 sm:grid-cols-12">
+                    {months.map((month, i) => {
+                      const active = product.harvestMonths?.includes(i + 1);
+                      return (
+                        <li
+                          key={month}
+                          className={cn(
+                            'rounded-xl py-2 text-center text-xs font-semibold',
+                            active ? 'bg-brand-500 text-white' : 'bg-ink/5 text-ink/35',
+                          )}
+                        >
+                          <span className="sr-only">{active ? 'In season: ' : 'Off season: '}</span>
+                          {month}
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </>
+              )}
 
               <p className="mt-8 flex items-center gap-3 rounded-2xl bg-brand-50 px-5 py-4 text-sm text-brand-900">
                 <Icon name="snowflake" size={18} className="text-brand-600" />

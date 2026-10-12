@@ -3,16 +3,15 @@ import { certificates as fallbackCertificates, exhibitions as fallbackExhibition
 import { categories as localCategories, getCategoryLabel, products as localProducts } from '@/data/products';
 import {
   apiAssetUrl,
-  getAllProductImages,
   getAllProducts,
   getCertifications,
   getExhibitions,
   getProductById,
   USE_MOCK_DATA,
+  type ApiNamedItem,
   type ApiProduct,
-  type ApiProductImage,
 } from '@/lib/api';
-import type { LocalProduct, Product, ProductCategory } from '@/types';
+import type { LocalProduct, Product, ProductCategory, ProductSpec } from '@/types';
 
 export type Certificate = {
   id: string | number;
@@ -94,7 +93,20 @@ function findLocalProduct(name: string) {
 function categoryFromApi(product: ApiProduct): ProductCategory {
   const label = product.productCategoryName ?? '';
   const known = localCategories.find((c) => sameText(c.label, label) || c.id === slugify(label));
-  return { id: known?.id ?? (slugify(label) || `category-${product.productCategoryId}`), label };
+  if (known) return { id: known.id, label: known.label };
+  return { id: slugify(label) || `category-${product.productCategoryId}`, label };
+}
+
+const names = (items: ApiNamedItem[] | null) => (items ?? []).map((item) => item.name.replace(/\s+/g, ' ').trim());
+
+function specsFromApi(product: ApiProduct): ProductSpec[] {
+  const rows: [string, ApiNamedItem[] | null][] = [
+    ['Varieties', product.varieties],
+    ['Types', product.types],
+    ['Vitamins', product.vitamins],
+    ['Minerals', product.minerals],
+  ];
+  return rows.filter(([, items]) => items?.length).map(([label, items]) => ({ label, value: names(items).join(', ') }));
 }
 
 function fromLocal(product: LocalProduct): Product {
@@ -109,14 +121,16 @@ function fromLocal(product: LocalProduct): Product {
   };
 }
 
-function fromApi(product: ApiProduct, images: ApiProductImage[]): Product {
+function fromApi(product: ApiProduct): Product {
   const local = findLocalProduct(product.name);
   const category = categoryFromApi(product);
-  const apiImages = images
-    .filter((img) => img.productId === product.id)
+  const images = [...(product.images ?? [])]
     .sort((a, b) => a.id - b.id)
     .map((img) => apiAssetUrl(img.imagePath))
     .filter((src): src is string => !!src);
+  const specs = specsFromApi(product);
+  const packing = names(product.packingTypes);
+  const harvestMonths = (product.harvestMonths ?? []).map((m) => m.code);
 
   return {
     id: product.id,
@@ -124,9 +138,11 @@ function fromApi(product: ApiProduct, images: ApiProductImage[]): Product {
     name: product.name,
     category: category.id,
     categoryLabel: category.label,
-    images: apiImages.length ? apiImages : local ? fromLocal(local).images : [],
+    images: images.length ? images : local ? fromLocal(local).images : [],
     summary: product.description ?? local?.summary ?? '',
-    specs: local?.specs,
+    specs: specs.length ? specs : local?.specs,
+    packing: packing.length ? packing : undefined,
+    harvestMonths: harvestMonths.length ? harvestMonths : undefined,
   };
 }
 
@@ -139,17 +155,17 @@ export const loadProductCatalog = cache(async (): Promise<ProductCatalog> => {
   if (USE_MOCK_DATA) return localCatalog();
 
   try {
-    const [apiProducts, images] = await Promise.all([
-      getAllProducts(),
-      getAllProductImages().catch((error) => {
-        logApiFailure('Product images failed', error);
-        return [] as ApiProductImage[];
-      }),
-    ]);
+    const apiProducts = await getAllProducts();
     if (!apiProducts.length) return localCatalog();
 
-    const products = apiProducts.map((p) => fromApi(p, images));
-    const categories = [...new Map(products.map((p) => [p.category, { id: p.category, label: p.categoryLabel }])).values()];
+    const products = apiProducts.map(fromApi);
+    const order = (id: string) => {
+      const index = localCategories.findIndex((c) => c.id === id);
+      return index === -1 ? localCategories.length : index;
+    };
+    const categories = [...new Map(products.map((p) => [p.category, { id: p.category, label: p.categoryLabel }])).values()].sort(
+      (a, b) => order(a.id) - order(b.id),
+    );
     return { categories, products };
   } catch (error) {
     logApiFailure('Products failed, using local data', error);
@@ -163,8 +179,8 @@ export async function loadProduct(slug: string) {
   if (!product?.id) return product;
 
   try {
-    const details = fromApi(await getProductById(product.id), []);
-    return { ...product, ...details, slug: product.slug, images: product.images };
+    const details = fromApi(await getProductById(product.id));
+    return { ...product, ...details, slug: product.slug };
   } catch (error) {
     logApiFailure(`Product ${product.id} failed`, error);
     return product;

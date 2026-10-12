@@ -59,12 +59,30 @@ export type ApiProduct = {
   descriptionLocalization: string | null;
   productCategoryId: number;
   productCategoryName: string | null;
+  images: ApiProductImage[] | null;
+  varieties: ApiNamedItem[] | null;
+  types: ApiNamedItem[] | null;
+  packingTypes: ApiNamedItem[] | null;
+  vitamins: ApiNamedItem[] | null;
+  minerals: ApiNamedItem[] | null;
+  harvestMonths: ApiHarvestMonth[] | null;
 };
 
 export type ApiProductImage = {
   id: number;
-  productId: number;
   imagePath: string | null;
+};
+
+export type ApiNamedItem = {
+  id: number;
+  name: string;
+  nameLocalization: string | null;
+};
+
+export type ApiHarvestMonth = {
+  code: number;
+  month: string;
+  displayName: string;
 };
 
 export type ContactMessage = {
@@ -157,19 +175,6 @@ export function getProductById(id: number) {
     next: { revalidate: REVALIDATE_SECONDS, tags: ['products', `product-${id}`] },
   });
 }
-
-export function getProductImages({ pageNumber = 1, pageSize = 50, productId }: PaginatedListRequest & { productId?: number } = {}) {
-  return apiPost<PaginatedList<ApiProductImage>>(
-    '/api/v1/ProductImage/GetPaginatedList',
-    { pageNumber, pageSize, productId },
-    { next: { revalidate: REVALIDATE_SECONDS, tags: ['product-images'] } },
-  );
-}
-
-export function getAllProductImages() {
-  return getAllPages((pageNumber) => getProductImages({ pageNumber, pageSize: 200 }));
-}
-
 export async function createContactMessage(message: ContactMessage) {
   if (USE_MOCK_DATA) return null;
   return apiPost<unknown>('/api/v1/ContactUs/Create', message, { cache: 'no-store' });

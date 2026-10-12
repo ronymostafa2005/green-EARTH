@@ -26,6 +26,9 @@ export type Product = {
   images: string[];
   summary: string;
   specs?: ProductSpec[];
+  packing?: string[];
+  /** Month numbers 1–12 */
+  harvestMonths?: number[];
 };
 
 export type NavLink = {
