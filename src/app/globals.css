@@ -21,9 +21,29 @@
 
   --color-cream: #f7f6f1;
   --color-ink: #17200f;
+  --color-wine: #6b0f1a;
+  --color-silver: #d9dce1;
+  --color-shine: color-mix(in oklab, var(--color-wine) 55%, var(--color-silver));
 
   --animate-marquee: marquee 45s linear infinite;
   --animate-fade-in: fade-in 0.4s ease;
+  --animate-shimmer: shimmer 3.5s linear infinite;
+  --animate-border-spin: border-spin 4s linear infinite;
+
+  @keyframes shimmer {
+    from {
+      background-position: 120% 0;
+    }
+    to {
+      background-position: -30% 0;
+    }
+  }
+
+  @keyframes border-spin {
+    to {
+      --border-angle: 360deg;
+    }
+  }
 
   @keyframes marquee {
     to {
@@ -41,6 +61,39 @@
 @theme inline {
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-instrument), ui-serif, Georgia, serif;
+}
+
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@utility text-shimmer {
+  background-image: linear-gradient(
+    100deg,
+    currentColor 0% 42%,
+    var(--color-shine) 50%,
+    currentColor 58% 100%
+  );
+  background-size: 250% 100%;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: var(--animate-shimmer);
+}
+
+@utility border-shimmer {
+  border: 2px solid transparent;
+  background:
+    linear-gradient(var(--color-white), var(--color-white)) padding-box,
+    conic-gradient(
+        from var(--border-angle),
+        rgb(23 32 15 / 0.06) 0deg 270deg,
+        var(--color-shine) 320deg,
+        rgb(23 32 15 / 0.06) 360deg
+      )
+      border-box;
+  animation: var(--animate-border-spin);
 }
 
 @layer base {

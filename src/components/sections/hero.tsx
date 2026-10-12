@@ -15,8 +15,8 @@ export function Hero() {
       <Container className="grid items-center gap-14 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
         <div>
           <Eyebrow>Premium IQF · Made in Egypt</Eyebrow>
-          <h1 className="mt-7 text-5xl leading-[1.02] font-semibold tracking-tight text-balance sm:text-6xl xl:text-7xl">
-            Egypt’s harvest, <em className="font-serif font-normal text-brand-600">frozen</em> at its peak.
+          <h1 className="mt-7 text-shimmer pb-2 text-5xl leading-[1.02] font-semibold tracking-tight text-balance sm:text-6xl xl:text-7xl">
+            Egypt’s harvest, <em className="text-shimmer font-serif font-normal text-brand-600">frozen</em> at its peak.
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink/60">
             Demeter Green Earth grows, freezes and exports premium fruits and vegetables from Egypt’s most fertile

@@ -41,7 +41,7 @@ export function WhyUs() {
         </div>
 
         <div className="mt-14 grid gap-4 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-[repeat(2,minmax(250px,auto))]">
-          <article className="relative min-h-[340px] overflow-hidden rounded-[2rem] md:col-span-2 lg:row-span-2">
+          <article className="relative min-h-[420px] overflow-hidden sm:min-h-[340px] rounded-[2rem] md:col-span-2 lg:row-span-2">
             <Image
               src="/images/pages/quality.jpg"
               alt="A basket of fresh Egyptian vegetables"
@@ -49,8 +49,8 @@ export function WhyUs() {
               sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-linear-to-t from-brand-950/85 via-brand-950/10 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 p-8 text-white sm:p-10">
+            <div className="absolute inset-0 bg-linear-to-t from-brand-950/90 via-brand-950/40 to-transparent sm:via-brand-950/10" />
+            <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-10">
               <h3 className="text-2xl font-semibold sm:text-3xl">Premium Egyptian quality</h3>
               <p className="mt-3 max-w-md leading-relaxed text-white/75">
                 We select the finest crops from Egypt’s most fertile lands, harvested at exactly the right moment.

@@ -45,7 +45,7 @@ export function SiteHeader() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <ButtonLink href="/contact" size="sm" className="hidden sm:inline-flex">
+            <ButtonLink href="/contact" size="sm" className="max-sm:hidden">
               Get a quote
               <Icon name="arrow" />
             </ButtonLink>
