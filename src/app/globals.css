@@ -1,0 +1,75 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-brand-50: #f3f8ec;
+  --color-brand-100: #e3efd2;
+  --color-brand-200: #c8dfa8;
+  --color-brand-300: #a9cb7a;
+  --color-brand-400: #94bc5c;
+  --color-brand-500: #82ae46;
+  --color-brand-600: #659034;
+  --color-brand-700: #4b6f27;
+  --color-brand-800: #355220;
+  --color-brand-900: #223818;
+  --color-brand-950: #13210d;
+
+  --color-sand-100: #f8efe3;
+  --color-sand-200: #efdcc3;
+  --color-sand-300: #e3c49c;
+  --color-sand-400: #d4ae7f;
+  --color-sand-500: #bf915c;
+
+  --color-cream: #f7f6f1;
+  --color-ink: #17200f;
+
+  --animate-marquee: marquee 45s linear infinite;
+  --animate-fade-in: fade-in 0.4s ease;
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+}
+
+@theme inline {
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument), ui-serif, Georgia, serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-white font-sans text-ink antialiased;
+  }
+
+  ::selection {
+    @apply bg-brand-500 text-white;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-500;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
