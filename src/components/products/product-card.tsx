@@ -1,29 +1,36 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Icon } from '@/components/ui/icon';
-import { getCategoryLabel } from '@/data/products';
 import { cn } from '@/lib/utils';
 import type { Product } from '@/types';
 
 const imageSizes = '(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 300px';
 
 export function ProductCard({ product }: { product: Product }) {
+  const [image, pack] = product.images;
+
   return (
     <Link href={`/products/${product.slug}`} className="group block">
       <div className="relative aspect-square overflow-hidden rounded-3xl border-shimmer sm:rounded-[1.75rem] transition duration-300 group-hover:shadow-[0_24px_50px_-24px_rgb(23_32_15/0.35)]">
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          sizes={imageSizes}
-          className={cn(
-            'object-contain p-4 transition sm:p-7 duration-500 group-hover:scale-105',
-            product.pack && 'group-hover:opacity-0',
-          )}
-        />
-        {product.pack && (
+        {image ? (
           <Image
-            src={product.pack}
+            src={image}
+            alt={product.name}
+            fill
+            sizes={imageSizes}
+            className={cn(
+              'object-contain p-4 transition sm:p-7 duration-500 group-hover:scale-105',
+              pack && 'group-hover:opacity-0',
+            )}
+          />
+        ) : (
+          <span className="absolute inset-0 grid place-items-center text-brand-300">
+            <Icon name="snowflake" size={40} />
+          </span>
+        )}
+        {pack && (
+          <Image
+            src={pack}
             alt=""
             fill
             sizes={imageSizes}
@@ -31,7 +38,7 @@ export function ProductCard({ product }: { product: Product }) {
           />
         )}
         <span className="absolute top-4 left-4 rounded-full max-sm:hidden bg-cream px-3 py-1 text-[11px] font-semibold text-ink/60">
-          {getCategoryLabel(product.category)}
+          {product.categoryLabel}
         </span>
       </div>
 

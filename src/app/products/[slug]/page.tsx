@@ -9,32 +9,35 @@ import { Icon } from '@/components/ui/icon';
 import { Section } from '@/components/ui/section';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { siteConfig } from '@/config/site';
-import { getCategoryLabel, getProduct, packingSizes, products } from '@/data/products';
+import { packingSizes } from '@/data/products';
+import { loadProduct, loadProductCatalog } from '@/lib/content';
 import { whatsappLink } from '@/lib/utils';
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const { products } = await loadProductCatalog();
   return products.map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
-  const product = getProduct((await params).slug);
+  const product = await loadProduct((await params).slug);
   if (!product) return {};
 
   return {
     title: product.name,
     description: product.summary,
-    openGraph: { images: [product.image] },
+    openGraph: { images: product.images.slice(0, 1) },
   };
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const product = getProduct((await params).slug);
+  const product = await loadProduct((await params).slug);
   if (!product) notFound();
 
+  const { products } = await loadProductCatalog();
   const others = products.filter((p) => p.slug !== product.slug);
   const related = [
     ...others.filter((p) => p.category === product.category),
@@ -70,7 +73,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
             <div className="lg:pt-6">
               <span className="rounded-full bg-brand-50 px-3.5 py-1.5 text-xs font-semibold tracking-[0.14em] text-brand-700 uppercase">
-                {getCategoryLabel(product.category)}
+                {product.categoryLabel}
               </span>
               <h1 className="mt-6 text-4xl font-semibold tracking-tight sm:text-5xl">{product.name}</h1>
               <p className="mt-5 text-lg leading-relaxed text-ink/60">{product.summary}</p>

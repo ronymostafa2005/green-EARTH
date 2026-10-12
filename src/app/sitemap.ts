@@ -1,8 +1,9 @@
 import type { MetadataRoute } from 'next';
 import { mainNav, siteConfig } from '@/config/site';
-import { products } from '@/data/products';
+import { loadProductCatalog } from '@/lib/content';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const { products } = await loadProductCatalog();
   const pages = [...mainNav.map((link) => link.href), '/contact'];
   const productPages = products.map((p) => `/products/${p.slug}`);
 

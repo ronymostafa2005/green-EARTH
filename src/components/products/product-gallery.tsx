@@ -6,25 +6,24 @@ import { cn } from '@/lib/utils';
 import type { Product } from '@/types';
 
 export function ProductGallery({ product }: { product: Product }) {
-  const images = [
-    { src: product.image, label: 'Product' },
-    ...(product.pack ? [{ src: product.pack, label: 'Packaging' }] : []),
-  ];
+  const images = product.images.map((src, i) => ({ src, label: i === 0 ? 'Product' : `Image ${i + 1}` }));
   const [current, setCurrent] = useState(0);
   const image = images[current];
 
   return (
     <div className="lg:sticky lg:top-28">
       <div className="relative aspect-square overflow-hidden rounded-[2rem] bg-cream">
-        <Image
-          key={image.src}
-          src={image.src}
-          alt={`${product.name} — ${image.label.toLowerCase()}`}
-          fill
-          priority
-          sizes="(max-width: 1024px) 100vw, 50vw"
-          className="animate-fade-in object-contain p-10 mix-blend-multiply"
-        />
+        {image && (
+          <Image
+            key={image.src}
+            src={image.src}
+            alt={`${product.name} — ${image.label.toLowerCase()}`}
+            fill
+            priority
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="animate-fade-in object-contain p-10 mix-blend-multiply"
+          />
+        )}
       </div>
 
       {images.length > 1 && (

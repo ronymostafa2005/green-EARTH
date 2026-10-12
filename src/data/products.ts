@@ -1,4 +1,4 @@
-import type { Category, Product } from '@/types';
+import type { Category, LocalProduct } from '@/types';
 
 export const categories: { id: Category; label: string }[] = [
   { id: 'fruits', label: 'Frozen fruits' },
@@ -10,7 +10,7 @@ export const packingSizes = ['500 g', '1 kg', '2.5 kg', '10 kg'];
 
 const img = (name: string) => `/images/products/${name}.jpg`;
 
-export const products: Product[] = [
+export const products: LocalProduct[] = [
   {
     slug: 'strawberries',
     name: 'Strawberries',
@@ -160,10 +160,6 @@ export const products: Product[] = [
     summary: 'Tender artichoke hearts preserved in brine, ready to serve.',
   },
 ];
-
-export function getProduct(slug: string) {
-  return products.find((p) => p.slug === slug);
-}
 
 export function getCategoryLabel(id: Category) {
   return categories.find((c) => c.id === id)?.label ?? '';

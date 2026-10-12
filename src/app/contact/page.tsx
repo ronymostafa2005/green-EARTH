@@ -92,7 +92,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
           <div className="rounded-[2rem] bg-cream p-8 sm:p-10">
             <h2 className="text-3xl font-semibold tracking-tight">Send us a message</h2>
             <p className="mt-3 mb-8 leading-relaxed text-ink/60">
-              Fill in the form and your email app will open with everything ready to send.
+              Fill in the form and our export team will get back to you as soon as possible.
             </p>
             <ContactForm product={product} />
           </div>

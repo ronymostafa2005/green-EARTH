@@ -4,8 +4,11 @@ import { Container } from '@/components/ui/container';
 import { Icon } from '@/components/ui/icon';
 import { Section } from '@/components/ui/section';
 import { SectionHeading } from '@/components/ui/section-heading';
+import { loadProductCatalog } from '@/lib/content';
 
-export function FeaturedProducts() {
+export async function FeaturedProducts() {
+  const { products, categories } = await loadProductCatalog();
+
   return (
     <Section className="bg-cream">
       <Container>
@@ -28,7 +31,7 @@ export function FeaturedProducts() {
           </Link>
         </div>
 
-        <ProductGrid limit={8} />
+        <ProductGrid products={products} categories={categories} limit={8} />
       </Container>
     </Section>
   );

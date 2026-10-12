@@ -4,13 +4,16 @@ import { Container } from '@/components/ui/container';
 import { Section } from '@/components/ui/section';
 import { CtaSection } from '@/components/sections/cta-section';
 import { PageHero } from '@/components/sections/page-hero';
+import { loadProductCatalog } from '@/lib/content';
 
 export const metadata: Metadata = {
   title: 'Products',
   description: 'IQF frozen fruits, frozen vegetables and vegetables in brine from Demeter Green Earth.',
 };
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+  const { products, categories } = await loadProductCatalog();
+
   return (
     <>
       <PageHero
@@ -20,7 +23,7 @@ export default function ProductsPage() {
 
       <Section>
         <Container>
-          <ProductGrid syncUrl />
+          <ProductGrid products={products} categories={categories} syncUrl />
         </Container>
       </Section>
 

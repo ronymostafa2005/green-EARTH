@@ -1,7 +1,8 @@
 import { Icon } from '@/components/ui/icon';
-import { products } from '@/data/products';
+import { loadProductCatalog } from '@/lib/content';
 
-export function Marquee() {
+export async function Marquee() {
+  const { products } = await loadProductCatalog();
   const names = products.map((p) => p.name);
 
   return (

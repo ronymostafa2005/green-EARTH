@@ -1,12 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { startTransition, useActionState } from 'react';
 import { buttonStyles } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { siteConfig } from '@/config/site';
+import { sendContactMessage, type ContactFormState } from './contact-action';
 
 const inputStyles =
   'w-full rounded-2xl border border-ink/10 bg-white px-4 py-3.5 text-sm outline-none transition placeholder:text-ink/35 focus:border-brand-500 focus:ring-4 focus:ring-brand-100';
+
+const initialState: ContactFormState = { status: 'idle' };
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -18,24 +21,23 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 export function ContactForm({ product }: { product?: string }) {
-  const [sent, setSent] = useState(false);
+  const [state, formAction, pending] = useActionState(sendContactMessage, initialState);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const data = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
+    const data = new FormData(e.currentTarget);
+    startTransition(() => formAction(data));
+  }
 
-    const subject = `Inquiry from ${data.name}${data.company ? ` – ${data.company}` : ''}`;
-    const body = [
-      `Name: ${data.name}`,
-      `Company: ${data.company}`,
-      `Email: ${data.email}`,
-      `Country: ${data.country}`,
-      '',
-      data.message,
-    ].join('\n');
-
-    window.location.href = `mailto:${siteConfig.contact.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    setSent(true);
+  if (state.status === 'success') {
+    return (
+      <div className="flex items-start gap-3 rounded-2xl bg-white p-6 text-brand-700">
+        <Icon name="check" size={20} />
+        <p className="text-sm leading-relaxed">
+          Thank you! Your message has been sent — our export team will get back to you soon.
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -55,6 +57,15 @@ export function ContactForm({ product }: { product?: string }) {
         </Field>
       </div>
 
+      <Field label="Subject">
+        <input
+          name="subject"
+          defaultValue={product ? `Inquiry about ${product}` : ''}
+          placeholder="Price offer, samples, partnership…"
+          className={inputStyles}
+        />
+      </Field>
+
       <Field label="Message">
         <textarea
           name="message"
@@ -67,13 +78,13 @@ export function ContactForm({ product }: { product?: string }) {
       </Field>
 
       <div className="flex flex-wrap items-center gap-4">
-        <button type="submit" className={buttonStyles({ size: 'lg' })}>
-          Send message
+        <button type="submit" disabled={pending} className={`${buttonStyles({ size: 'lg' })} disabled:cursor-wait disabled:opacity-60`}>
+          {pending ? 'Sending…' : 'Send message'}
           <Icon name="arrow" />
         </button>
-        {sent && (
-          <p className="text-sm text-brand-700">
-            Your email app should open now. If not, write to {siteConfig.contact.email}.
+        {state.status === 'error' && (
+          <p role="alert" className="text-sm text-red-600">
+            {state.message} You can also write to {siteConfig.contact.email}.
           </p>
         )}
       </div>

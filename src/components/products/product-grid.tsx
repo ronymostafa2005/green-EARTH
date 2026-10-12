@@ -2,36 +2,34 @@
 
 import { useEffect, useState } from 'react';
 import { ProductCard } from './product-card';
-import { categories, products } from '@/data/products';
 import { cn } from '@/lib/utils';
-import type { Category } from '@/types';
-
-type Filter = Category | 'all';
-
-const filters: { id: Filter; label: string }[] = [{ id: 'all', label: 'All' }, ...categories];
+import type { Product, ProductCategory } from '@/types';
 
 type ProductGridProps = {
+  products: Product[];
+  categories: ProductCategory[];
   limit?: number;
   syncUrl?: boolean;
 };
 
-export function ProductGrid({ limit, syncUrl = false }: ProductGridProps) {
-  const [active, setActive] = useState<Filter>('all');
+export function ProductGrid({ products, categories, limit, syncUrl = false }: ProductGridProps) {
+  const [active, setActive] = useState('all');
+  const filters = [{ id: 'all', label: 'All' }, ...categories];
 
   useEffect(() => {
     if (!syncUrl) return;
     const fromUrl = new URLSearchParams(window.location.search).get('category');
-    if (filters.some((f) => f.id === fromUrl)) setActive(fromUrl as Filter);
-  }, [syncUrl]);
+    if (fromUrl && categories.some((c) => c.id === fromUrl)) setActive(fromUrl);
+  }, [syncUrl, categories]);
 
-  function select(id: Filter) {
+  function select(id: string) {
     setActive(id);
     if (syncUrl) {
       window.history.replaceState(null, '', id === 'all' ? window.location.pathname : `?category=${id}`);
     }
   }
 
-  const count = (id: Filter) => (id === 'all' ? products.length : products.filter((p) => p.category === id).length);
+  const count = (id: string) => (id === 'all' ? products.length : products.filter((p) => p.category === id).length);
   const filtered = active === 'all' ? products : products.filter((p) => p.category === active);
   const visible = limit ? filtered.slice(0, limit) : filtered;
 
