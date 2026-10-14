@@ -60,7 +60,7 @@ Base URL: `https://clinicaipoweredsystem.runasp.net/api/v1/`
 ### Product
 | الحقل / الـ Endpoint | ليه |
 |---|---|
-| `isVisible: bool` + `PUT Product/ToggleVisibility/{id}` (اختياري) | زرار "Show / Un Show" **شغال حاليًا من غير الباك** — الحالة متخزنة على سيرفر الموقع. لو الموقع هيترفع على Vercel (مفيش تخزين دائم) هنحتاج الحقل ده من الباك. |
+| `isVisible: bool` + `PUT Product/ToggleVisibility/{id}` (اختياري) | زرار "Show / Un Show" **شغال حاليًا من غير الباك** — الحالة متخزنة في Upstash Redis على Vercel. لو اتضاف الحقل في الباك ممكن ننقلها له. |
 | `displayOrder: int` | ترتيب المنتجات في الموقع. |
 | `slug: string` (unique، إنجليزي) | لينك المنتج في الموقع `/products/{slug}` — حاليًا بنولّده من الاسم. |
 | فلاتر في `GetPaginatedList`: `productCategoryId`, `showOnHome` | الصفحة الرئيسية وتابات الأقسام. |

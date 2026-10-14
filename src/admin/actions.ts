@@ -257,6 +257,11 @@ export async function setProductVisibility(id: number, visible: boolean): Promis
     revalidatePath('/products/[slug]', 'page');
     return success('saved');
   } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code === 'EROFS' || code === 'EACCES' || code === 'EPERM') {
+      console.error('[admin] visibility storage is read-only — connect Upstash Redis', error);
+      return { ok: false, message: (await getDictionary()).products.storageMissing, at: Date.now() };
+    }
     return errorResult(error);
   }
 }
