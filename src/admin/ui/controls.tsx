@@ -39,7 +39,7 @@ export function Field({
 
 export function Switch({ name, label, defaultChecked }: { name: string; label: React.ReactNode; defaultChecked?: boolean }) {
   return (
-    <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-stone-200/90 bg-[#fbfcf9] px-3.5 py-2.5 dark:border-white/10 dark:bg-white/[0.04]">
+    <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-stone-200/90 bg-[#fbfcf9] px-3.5 py-2.5 dark:border-white/10 dark:bg-[#1d211a]">
       <span className="text-[13px] font-semibold text-stone-700 dark:text-stone-300">{label}</span>
       <input type="checkbox" name={name} defaultChecked={defaultChecked} className="peer sr-only" />
       <span

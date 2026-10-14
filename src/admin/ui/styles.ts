@@ -35,7 +35,7 @@ export function adminButton({
 }
 
 export const inputStyles =
-  'w-full rounded-xl border border-stone-200/90 bg-[#fbfcf9] px-3.5 py-2.5 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 hover:border-stone-300 focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-500/15 disabled:opacity-60 dark:border-white/10 dark:bg-white/[0.04] dark:text-stone-100 dark:placeholder:text-stone-500 dark:hover:border-white/20';
+  'w-full rounded-xl border border-stone-200/90 bg-[#fbfcf9] px-3.5 py-2.5 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 hover:border-stone-300 focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-500/15 disabled:opacity-60 dark:border-white/10 dark:bg-[#1d211a] dark:text-stone-100 dark:placeholder:text-stone-500 dark:hover:border-white/20 dark:focus:border-brand-400 dark:focus:bg-[#1d211a] dark:focus:ring-brand-400/15';
 
 /** Raised card on the tinted page background. */
 export const surface =

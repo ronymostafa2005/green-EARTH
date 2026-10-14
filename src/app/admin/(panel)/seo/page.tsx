@@ -33,7 +33,7 @@ export default async function SeoPage({ searchParams }: SeoPageProps) {
               'rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap ring-1 transition',
               p === page
                 ? 'bg-brand-700 text-white ring-brand-700 dark:bg-brand-500 dark:text-brand-950 dark:ring-brand-500'
-                : 'bg-white text-stone-600 ring-stone-200 hover:text-brand-700 hover:ring-brand-300 dark:bg-white/5 dark:text-stone-300 dark:ring-white/10',
+                : 'bg-white text-stone-600 ring-stone-200 hover:text-brand-700 hover:ring-brand-300 dark:bg-white/5 dark:text-stone-300 dark:ring-white/10 dark:hover:text-brand-300 dark:hover:ring-brand-400/40',
             )}
           >
             {t.seo.pages[p]}

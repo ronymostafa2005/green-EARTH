@@ -158,7 +158,7 @@ function IconPicker({ defaultValue }: { defaultValue: string | null }) {
               'grid size-10 place-items-center rounded-xl ring-1 transition',
               value === icon
                 ? 'bg-brand-600 text-white ring-brand-600 dark:bg-brand-500 dark:text-brand-950'
-                : 'bg-white text-stone-500 ring-stone-200 hover:text-brand-700 hover:ring-brand-300 dark:bg-white/5 dark:text-stone-400 dark:ring-white/10',
+                : 'bg-white text-stone-500 ring-stone-200 hover:text-brand-700 hover:ring-brand-300 dark:bg-white/5 dark:text-stone-400 dark:ring-white/10 dark:hover:text-brand-300 dark:hover:ring-brand-400/40',
             )}
           >
             <AdminIcon name={icon as AdminIconName} size={18} />
