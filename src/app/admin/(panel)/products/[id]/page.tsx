@@ -73,11 +73,15 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
       <div className="grid items-start gap-6 xl:grid-cols-[1.4fr_1fr]">
         <div className="grid gap-6">
           <ProductBasicsForm product={product} categories={toOptions(categories)} />
-          <ProductGallery productId={product.id} images={productImages(product)} />
+          <div id="gallery" className="scroll-mt-24">
+            <ProductGallery productId={product.id} images={productImages(product)} />
+          </div>
         </div>
         <div className="grid gap-6">
           <ProductVarieties productId={product.id} varieties={product.varieties ?? []} />
-          <ProductLinks productId={product.id} kind="types" items={typeLinks} options={lookups.types} />
+          <div id="types" className="scroll-mt-24">
+            <ProductLinks productId={product.id} kind="types" items={typeLinks} options={lookups.types} />
+          </div>
           <ProductLinks productId={product.id} kind="packing" items={packingLinks} options={lookups.packing} />
           <ProductLinks productId={product.id} kind="vitamins" items={vitaminLinks} options={lookups.vitamins} />
           <ProductLinks productId={product.id} kind="minerals" items={mineralLinks} options={lookups.minerals} />

@@ -11,7 +11,10 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getDictionary()).products.new };
 }
 
-export default async function NewProductPage() {
+type NewProductPageProps = { searchParams: Promise<{ category?: string }> };
+
+export default async function NewProductPage({ searchParams }: NewProductPageProps) {
+  const { category } = await searchParams;
   const t = await getDictionary();
   const [categories, types, packing, vitamins, minerals] = await Promise.all([
     listAll('ProductCategory'),
@@ -35,6 +38,7 @@ export default async function NewProductPage() {
       />
       <ProductCreateForm
         categories={toOptions(categories)}
+        defaultCategoryId={categories.some((c) => c.id === Number(category)) ? Number(category) : undefined}
         types={toOptions(types)}
         packing={toOptions(packing)}
         vitamins={toOptions(vitamins)}

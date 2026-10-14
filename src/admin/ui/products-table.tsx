@@ -21,11 +21,21 @@ type ProductRow = {
   slug: string;
 };
 
-export function ProductsTable({ products, categories, created }: { products: ProductRow[]; categories: Option[]; created: boolean }) {
+export function ProductsTable({
+  products,
+  categories,
+  created,
+  initialCategory,
+}: {
+  products: ProductRow[];
+  categories: Option[];
+  created: boolean;
+  initialCategory: number | 'all';
+}) {
   const { t, locale, toast } = useAdmin();
   const router = useRouter();
   const [query, setQuery] = useState('');
-  const [category, setCategory] = useState<number | 'all'>('all');
+  const [category, setCategory] = useState<number | 'all'>(initialCategory);
   const [deleting, setDeleting] = useState<ProductRow | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -136,6 +146,20 @@ export function ProductsTable({ products, categories, created }: { products: Pro
                 </span>
               </Link>
               <div className="flex items-center gap-1">
+                <Link
+                  href={`/admin/products/${p.id}#gallery`}
+                  className={adminButton({ variant: 'secondary', size: 'sm', className: 'max-md:hidden' })}
+                >
+                  <AdminIcon name="image" size={15} />
+                  {t.products.gallery}
+                </Link>
+                <Link
+                  href={`/admin/products/${p.id}#types`}
+                  className={adminButton({ variant: 'secondary', size: 'sm', className: 'me-1 max-md:hidden' })}
+                >
+                  <AdminIcon name="layers" size={15} />
+                  {t.products.types}
+                </Link>
                 <a
                   href={`/products/${p.slug}`}
                   target="_blank"

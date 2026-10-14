@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useMemo, useState, useTransition } from 'react';
 import { cn } from '@/lib/utils';
 import { deleteResource, saveResource } from '../actions';
@@ -61,10 +62,25 @@ function ResourceForm({ resourceKey, row, onDone }: { resourceKey: ResourceKey; 
   );
 }
 
-function RowActions({ onEdit, onDelete }: { onEdit: () => void; onDelete: () => void }) {
+function RowActions({ categoryId, onEdit, onDelete }: { categoryId?: number; onEdit: () => void; onDelete: () => void }) {
   const { t } = useAdmin();
   return (
     <div className="flex items-center gap-1">
+      {categoryId !== undefined && (
+        <>
+          <Link
+            href={`/admin/products/new?category=${categoryId}`}
+            className={adminButton({ variant: 'secondary', size: 'sm', className: 'max-sm:hidden' })}
+          >
+            <AdminIcon name="plus" size={15} />
+            {t.products.addToCategory}
+          </Link>
+          <Link href={`/admin/products?category=${categoryId}`} className={adminButton({ variant: 'ghost', size: 'sm', className: 'text-brand-700 dark:text-brand-300' })}>
+            <AdminIcon name="box" size={15} />
+            {t.products.viewProducts}
+          </Link>
+        </>
+      )}
       <button type="button" onClick={onEdit} aria-label={t.common.edit} title={t.common.edit} className={adminButton({ variant: 'ghost', size: 'icon' })}>
         <AdminIcon name="pencil" size={16} />
       </button>
@@ -154,7 +170,7 @@ export function ResourceManager({ resourceKey, rows }: { resourceKey: ResourceKe
                 <th className="px-5 py-3 text-start">{t.fields.name} · {t.common.english}</th>
                 <th className="px-5 py-3 text-start">{t.fields.name} · {t.common.arabic}</th>
                 {config.fields.some((f) => f.key === 'description') && <th className="hidden px-5 py-3 text-start md:table-cell">{t.fields.description}</th>}
-                <th className="w-24 px-5 py-3 text-end">{t.common.actions}</th>
+                <th className="px-5 py-3 text-end">{t.common.actions}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100 dark:divide-white/5">
@@ -171,7 +187,11 @@ export function ResourceManager({ resourceKey, rows }: { resourceKey: ResourceKe
                   )}
                   <td className="px-5 py-2">
                     <div className="flex justify-end">
-                      <RowActions onEdit={() => setEditing(row)} onDelete={() => setDeleting(row)} />
+                      <RowActions
+                        categoryId={resourceKey === 'categories' ? row.id : undefined}
+                        onEdit={() => setEditing(row)}
+                        onDelete={() => setDeleting(row)}
+                      />
                     </div>
                   </td>
                 </tr>

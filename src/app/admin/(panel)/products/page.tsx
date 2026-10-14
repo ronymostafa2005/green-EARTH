@@ -12,10 +12,10 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getDictionary()).products.title };
 }
 
-type ProductsPageProps = { searchParams: Promise<{ created?: string }> };
+type ProductsPageProps = { searchParams: Promise<{ created?: string; category?: string }> };
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
-  const { created } = await searchParams;
+  const { created, category } = await searchParams;
   const t = await getDictionary();
   const [products, categories] = await Promise.all([listAll<ProductDetail>('Product'), listAll('ProductCategory')]);
 
@@ -32,7 +32,9 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         }
       />
       <ProductsTable
+        key={category ?? 'all'}
         created={created === '1'}
+        initialCategory={categories.some((c) => c.id === Number(category)) ? Number(category) : 'all'}
         categories={toOptions(categories)}
         products={products.map((p) => {
           const images = productImages(p);

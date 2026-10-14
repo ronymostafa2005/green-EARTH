@@ -47,12 +47,14 @@ function SaveBar({ pending, label, cancelHref }: { pending: boolean; label: stri
 
 export function ProductCreateForm({
   categories,
+  defaultCategoryId,
   types,
   packing,
   vitamins,
   minerals,
 }: {
   categories: Option[];
+  defaultCategoryId?: number;
   types: Option[];
   packing: Option[];
   vitamins: Option[];
@@ -79,7 +81,7 @@ export function ProductCreateForm({
         <div className="grid gap-5">
           <BilingualField name="name" label={t.fields.name} required />
           <div className="sm:max-w-sm">
-            <CategorySelect categories={categories} />
+            <CategorySelect categories={categories} defaultValue={defaultCategoryId} />
           </div>
           <BilingualField name="description" label={t.fields.description} multiline />
         </div>
