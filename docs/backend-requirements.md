@@ -60,8 +60,7 @@ Base URL: `https://clinicaipoweredsystem.runasp.net/api/v1/`
 ### Product
 | الحقل / الـ Endpoint | ليه |
 |---|---|
-| `showOnHome: bool` في response الـ `GetPaginatedList` و `GetById` (default = true) | زرار "view home Page — Show / Un Show" اللي كان في الداشبورد القديم. **الفرونت جاهز** — الزرار بيشتغل لوحده أول ما الحقل يظهر في الـ response. |
-| `PUT Product/ToggleShowOnHome/{id}` (بدون body — يقلب القيمة) | **ده الاسم اللي الفرونت بيناديه بالظبط.** |
+| `isVisible: bool` + `PUT Product/ToggleVisibility/{id}` (اختياري) | زرار "Show / Un Show" **شغال حاليًا من غير الباك** — الحالة متخزنة على سيرفر الموقع. لو الموقع هيترفع على Vercel (مفيش تخزين دائم) هنحتاج الحقل ده من الباك. |
 | `displayOrder: int` | ترتيب المنتجات في الموقع. |
 | `slug: string` (unique، إنجليزي) | لينك المنتج في الموقع `/products/{slug}` — حاليًا بنولّده من الاسم. |
 | فلاتر في `GetPaginatedList`: `productCategoryId`, `showOnHome` | الصفحة الرئيسية وتابات الأقسام. |

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { cn } from '@/lib/utils';
-import { deleteProduct, toggleShowOnHome } from '../actions';
+import { deleteProduct, setProductVisibility } from '../actions';
 import type { Option } from '../products';
 import { adminButton, ConfirmDialog, EmptyState, SearchInput, surface } from './controls';
 import { AdminIcon } from './icon';
@@ -19,33 +19,20 @@ type ProductRow = {
   thumbnail: string | null;
   imageCount: number;
   slug: string;
-  /** Null until the backend sends the flag. */
-  showOnHome: boolean | null;
+  visible: boolean;
 };
 
-function HomeToggle({ productId, initial }: { productId: number; initial: boolean | null }) {
+function VisibilityToggle({ productId, initial }: { productId: number; initial: boolean }) {
   const { t, toast } = useAdmin();
   const [shown, setShown] = useState(initial);
   const [pending, startTransition] = useTransition();
 
-  if (shown === null) {
-    return (
-      <span
-        title={t.products.homeFlagPending}
-        className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1.5 text-xs font-semibold text-stone-400 dark:bg-white/5 dark:text-stone-500"
-      >
-        <AdminIcon name="eye" size={14} />
-        {t.products.show}
-      </span>
-    );
-  }
-
   const toggle = () =>
     startTransition(async () => {
       setShown(!shown);
-      const result = await toggleShowOnHome(productId);
+      const result = await setProductVisibility(productId, !shown);
       if (!result.ok) setShown(shown);
-      toast(result.ok, result.message);
+      toast(result.ok, result.ok ? (shown ? t.products.hiddenDone : t.products.shownDone) : result.message);
     });
 
   return (
@@ -193,8 +180,8 @@ export function ProductsTable({
                 </span>
               </Link>
               <div className="flex flex-col items-center gap-1 px-2">
-                <span className="text-[10px] font-semibold tracking-wide text-stone-400 uppercase max-sm:hidden">{t.products.homePage}</span>
-                <HomeToggle productId={p.id} initial={p.showOnHome} />
+                <span className="text-[10px] font-semibold tracking-wide text-stone-400 uppercase max-sm:hidden">{t.products.visibility}</span>
+                <VisibilityToggle productId={p.id} initial={p.visible} />
               </div>
               <div className="flex items-center gap-1">
                 <Link

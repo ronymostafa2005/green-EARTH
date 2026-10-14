@@ -4,7 +4,8 @@ import { cookies } from 'next/headers';
 import { redirect, unstable_rethrow } from 'next/navigation';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { API_BASE_URL, ApiError } from '@/lib/api';
-import { adminRequest, createItem, deleteItem, listAll, updateItem } from './api';
+import { setProductHidden } from '@/lib/visibility';
+import { createItem, deleteItem, listAll, updateItem } from './api';
 import { dictionaries, isLocale, isTheme } from './i18n';
 import { isProductLinkKind, isResourceKey, productLinks, resources, type Row } from './resources';
 import {
@@ -249,10 +250,11 @@ export async function deleteProduct(id: number): Promise<ActionResult> {
   }
 }
 
-export async function toggleShowOnHome(id: number): Promise<ActionResult> {
+export async function setProductVisibility(id: number, visible: boolean): Promise<ActionResult> {
   try {
-    await adminRequest(`Product/ToggleShowOnHome/${id}`, { method: 'PUT' });
-    refresh(['products'], ...productPaths(id));
+    await setProductHidden(id, !visible);
+    refresh(['products'], ...productPaths(id), '/', '/products', '/sitemap.xml');
+    revalidatePath('/products/[slug]', 'page');
     return success('saved');
   } catch (error) {
     return errorResult(error);

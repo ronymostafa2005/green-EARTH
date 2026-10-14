@@ -14,7 +14,6 @@ export type ProductDetail = Row & {
   descriptionLocalization: string | null;
   productCategoryId: number;
   productCategoryName: string | null;
-  showOnHome?: boolean | null;
   images: { id: number; imagePath: string | null }[] | null;
   varieties: { id: number; name: string }[] | null;
   types: { id: number; name: string }[] | null;

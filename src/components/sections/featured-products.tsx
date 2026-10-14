@@ -7,11 +7,7 @@ import { SectionHeading } from '@/components/ui/section-heading';
 import { loadProductCatalog } from '@/lib/content';
 
 export async function FeaturedProducts() {
-  const catalog = await loadProductCatalog();
-  const picked = catalog.products.filter((p) => p.showOnHome === true);
-  const hasFlag = catalog.products.some((p) => p.showOnHome !== undefined);
-  const products = hasFlag && picked.length ? picked : catalog.products;
-  const categories = catalog.categories.filter((c) => products.some((p) => p.category === c.id));
+  const { products, categories } = await loadProductCatalog();
 
   return (
     <Section className="bg-cream">

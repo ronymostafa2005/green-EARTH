@@ -11,6 +11,7 @@ import {
   type ApiNamedItem,
   type ApiProduct,
 } from '@/lib/api';
+import { getHiddenProductIds } from '@/lib/visibility';
 import type { LocalProduct, Product, ProductCategory, ProductSpec } from '@/types';
 
 export type Certificate = {
@@ -143,7 +144,6 @@ function fromApi(product: ApiProduct): Product {
     specs: specs.length ? specs : local?.specs,
     packing: packing.length ? packing : undefined,
     harvestMonths: harvestMonths.length ? harvestMonths : undefined,
-    showOnHome: typeof product.showOnHome === 'boolean' ? product.showOnHome : undefined,
   };
 }
 
@@ -156,10 +156,10 @@ export const loadProductCatalog = cache(async (): Promise<ProductCatalog> => {
   if (USE_MOCK_DATA) return localCatalog();
 
   try {
-    const apiProducts = await getAllProducts();
+    const [apiProducts, hidden] = await Promise.all([getAllProducts(), getHiddenProductIds()]);
     if (!apiProducts.length) return localCatalog();
 
-    const products = apiProducts.map(fromApi);
+    const products = apiProducts.filter((p) => !hidden.has(p.id)).map(fromApi);
     const order = (id: string) => {
       const index = localCategories.findIndex((c) => c.id === id);
       return index === -1 ? localCategories.length : index;
