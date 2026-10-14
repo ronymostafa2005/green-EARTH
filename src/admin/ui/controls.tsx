@@ -117,12 +117,12 @@ export function Dialog({
       onClose={onClose}
       onClick={(e) => e.target === e.currentTarget && onClose()}
       className={cn(
-        'm-auto w-[calc(100%-2rem)] rounded-3xl bg-white p-0 text-stone-900 shadow-2xl ring-1 ring-brand-950/10 backdrop:bg-brand-950/40 backdrop:backdrop-blur-sm open:animate-fade-in dark:bg-[#171a14] dark:text-stone-100 dark:ring-white/10',
+        'm-auto w-[calc(100%-2rem)] overflow-hidden rounded-3xl bg-white p-0 text-stone-900 shadow-2xl ring-1 ring-brand-950/10 backdrop:bg-brand-950/40 backdrop:backdrop-blur-sm open:animate-fade-in dark:bg-[#171a14] dark:text-stone-100 dark:ring-white/10',
         { sm: 'max-w-md', md: 'max-w-2xl', lg: 'max-w-4xl' }[size],
       )}
     >
       {open && (
-        <div className="max-h-[85vh] overflow-y-auto">
+        <div className="max-h-[85vh] overflow-y-auto overscroll-contain [scrollbar-width:thin]">
           <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-stone-100 bg-white/90 px-6 py-5 backdrop-blur dark:border-white/5 dark:bg-[#171a14]/90">
             <div>
               <h2 className="text-lg font-semibold">{title}</h2>

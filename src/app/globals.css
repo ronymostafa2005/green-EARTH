@@ -166,6 +166,12 @@
     box-shadow: 0 0 0 1000px #1d211a inset;
   }
 
+  /* Only the open dialog scrolls; the gutter keeps the page from shifting when its scrollbar hides. */
+  html:has(dialog[open]) {
+    overflow: hidden;
+    scrollbar-gutter: stable;
+  }
+
   /* Native pickers (select popups, number spinners, scrollbars) follow the admin theme. */
   .dark {
     color-scheme: dark;
