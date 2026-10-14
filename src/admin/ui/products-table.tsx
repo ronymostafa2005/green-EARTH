@@ -43,14 +43,30 @@ function VisibilityToggle({ productId, initial }: { productId: number; initial: 
       aria-pressed={shown}
       title={shown ? t.products.shownHint : t.products.hiddenHint}
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ring-1 transition-all duration-200 active:scale-95 disabled:opacity-60',
+        'group inline-flex h-9 min-w-[7.5rem] cursor-pointer items-center justify-between gap-2.5 rounded-xl px-3 text-[13px] font-semibold shadow-sm ring-1 transition-all duration-200 ring-inset hover:-translate-y-px hover:shadow-md active:translate-y-0 active:scale-[0.97] disabled:cursor-wait disabled:opacity-70',
         shown
-          ? 'bg-brand-50 text-brand-700 ring-brand-600/20 hover:bg-brand-100 dark:bg-brand-500/10 dark:text-brand-300 dark:ring-brand-400/20'
-          : 'bg-red-50 text-red-600 ring-red-600/15 hover:bg-red-100 dark:bg-red-500/10 dark:text-red-400 dark:ring-red-400/20',
+          ? 'bg-brand-50 text-brand-800 ring-brand-600/30 hover:bg-brand-100 dark:bg-brand-500/15 dark:text-brand-200 dark:ring-brand-400/30 dark:hover:bg-brand-500/25'
+          : 'bg-red-50 text-red-700 ring-red-400/40 hover:bg-red-100 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-400/30 dark:hover:bg-red-500/20',
       )}
     >
-      <span className={cn('size-1.5 rounded-full', shown ? 'bg-brand-500' : 'bg-red-500', pending && 'animate-pulse')} />
-      {shown ? t.products.show : t.products.unShow}
+      <span className="flex items-center gap-1.5">
+        <AdminIcon name={shown ? 'eye' : 'eyeOff'} size={15} className={cn(pending && 'animate-pulse')} />
+        {shown ? t.products.show : t.products.unShow}
+      </span>
+      <span
+        aria-hidden
+        className={cn(
+          'relative h-[18px] w-8 shrink-0 rounded-full transition-colors duration-200',
+          shown ? 'bg-brand-600 dark:bg-brand-500' : 'bg-red-300 dark:bg-red-500/50',
+        )}
+      >
+        <span
+          className={cn(
+            'absolute top-0.5 size-3.5 rounded-full bg-white shadow transition-all duration-200',
+            shown ? 'start-[calc(100%-1rem)]' : 'start-0.5',
+          )}
+        />
+      </span>
     </button>
   );
 }
@@ -149,81 +165,117 @@ export function ProductsTable({
       {filtered.length === 0 ? (
         <EmptyState icon="search" title={t.common.noResults} />
       ) : (
-        <ul className="grid gap-3">
-          {filtered.map((p) => (
-            <li
-              key={p.id}
-              className={cn('flex items-center gap-4 rounded-2xl p-3 pe-4 transition hover:-translate-y-px hover:ring-brand-500/30 dark:hover:ring-white/15', surface)}
-            >
-              <Link href={`/admin/products/${p.id}`} className="flex min-w-0 flex-1 items-center gap-4">
-                <span className="relative z-0 size-16 shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-brand-50 to-sand-100/70 transition-all duration-300 ease-out hover:z-20 hover:scale-[1.9] hover:bg-white hover:shadow-[0_18px_40px_-12px_rgb(19_33_13/0.45)] hover:ring-1 hover:ring-brand-950/10 ltr:origin-left rtl:origin-right dark:from-white/5 dark:to-white/[0.02] dark:hover:bg-stone-800">
-                  {p.thumbnail ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.thumbnail} alt="" loading="lazy" className="size-full object-contain p-1.5" />
-                  ) : (
-                    <span className="grid size-full place-items-center text-stone-300 dark:text-stone-600">
-                      <AdminIcon name="image" />
-                    </span>
-                  )}
-                </span>
-                <span className="min-w-0">
-                  <span className="block truncate font-semibold">{locale === 'ar' ? p.nameLocalization || p.name : p.name}</span>
-                  <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-500 dark:text-stone-400">
-                    <span className="rounded-md bg-brand-50 px-2 py-0.5 font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-300">
+        <div className={cn('overflow-x-auto rounded-3xl xl:overflow-visible', surface)}>
+          <table className="w-full min-w-[760px] text-sm">
+            <thead>
+              <tr className="text-xs font-semibold text-brand-900/70 dark:text-stone-400">
+                {[
+                  { label: t.products.product, className: 'ps-5 text-start' },
+                  { label: t.fields.category, className: 'text-start' },
+                  { label: t.fields.images, className: 'text-center max-lg:hidden' },
+                  { label: t.products.visibility, className: 'text-center' },
+                  { label: t.common.actions, className: 'pe-5 text-end' },
+                ].map((column) => (
+                  <th
+                    key={column.label}
+                    scope="col"
+                    className={cn(
+                      'border-b border-brand-900/[0.07] bg-brand-50/70 px-3 py-3.5 whitespace-nowrap first:rounded-ss-3xl last:rounded-se-3xl dark:border-white/5 dark:bg-white/[0.03]',
+                      column.className,
+                    )}
+                  >
+                    {column.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-stone-100 dark:divide-white/5">
+              {filtered.map((p) => (
+                <tr key={p.id} className="group/row transition-colors hover:bg-brand-50/40 dark:hover:bg-white/[0.02]">
+                  <td className="py-3 ps-5 pe-3">
+                    <Link href={`/admin/products/${p.id}`} className="flex min-w-0 items-center gap-4">
+                      <span className="relative z-0 size-14 shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-brand-50 to-sand-100/70 ring-1 ring-brand-950/[0.05] transition-all duration-300 ease-out hover:z-20 hover:scale-[1.9] hover:bg-white hover:shadow-[0_18px_40px_-12px_rgb(19_33_13/0.45)] hover:ring-brand-950/10 ltr:origin-left rtl:origin-right dark:from-white/5 dark:to-white/[0.02] dark:ring-white/5 dark:hover:bg-stone-800">
+                        {p.thumbnail ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={p.thumbnail} alt="" loading="lazy" className="size-full object-contain p-1.5" />
+                        ) : (
+                          <span className="grid size-full place-items-center text-stone-300 dark:text-stone-600">
+                            <AdminIcon name="image" />
+                          </span>
+                        )}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block max-w-[16rem] truncate font-semibold text-stone-900 transition-colors group-hover/row:text-brand-700 dark:text-stone-100 dark:group-hover/row:text-brand-300">
+                          {locale === 'ar' ? p.nameLocalization || p.name : p.name}
+                        </span>
+                        <span className="mt-0.5 block max-w-[16rem] truncate text-xs text-stone-400" dir={locale === 'ar' ? 'ltr' : 'rtl'}>
+                          {locale === 'ar' ? (p.nameLocalization ? p.name : '') : p.nameLocalization}
+                        </span>
+                      </span>
+                    </Link>
+                  </td>
+                  <td className="px-3 py-3">
+                    <span className="inline-block rounded-lg bg-brand-50 px-2.5 py-1 text-xs font-semibold whitespace-nowrap text-brand-700 dark:bg-brand-500/10 dark:text-brand-300">
                       {categoryLabel(p)}
                     </span>
-                    <span className="flex items-center gap-1">
-                      <AdminIcon name="image" size={13} />
-                      {p.imageCount} {t.products.imagesCount}
-                    </span>
-                  </span>
-                </span>
-              </Link>
-              <div className="flex flex-col items-center gap-1 px-2">
-                <span className="text-[10px] font-semibold tracking-wide text-stone-400 uppercase max-sm:hidden">{t.products.visibility}</span>
-                <VisibilityToggle productId={p.id} initial={p.visible} />
-              </div>
-              <div className="flex items-center gap-1">
-                <Link
-                  href={`/admin/products/${p.id}#gallery`}
-                  className={adminButton({ variant: 'secondary', size: 'sm', className: 'max-md:hidden' })}
-                >
-                  <AdminIcon name="image" size={15} />
-                  {t.products.gallery}
-                </Link>
-                <Link
-                  href={`/admin/products/${p.id}#types`}
-                  className={adminButton({ variant: 'secondary', size: 'sm', className: 'me-1 max-md:hidden' })}
-                >
-                  <AdminIcon name="layers" size={15} />
-                  {t.products.types}
-                </Link>
-                <a
-                  href={`/products/${p.slug}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={t.products.viewOnSite}
-                  title={t.products.viewOnSite}
-                  className={adminButton({ variant: 'ghost', size: 'icon', className: 'max-sm:hidden' })}
-                >
-                  <AdminIcon name="external" size={16} />
-                </a>
-                <Link href={`/admin/products/${p.id}`} aria-label={t.common.edit} title={t.common.edit} className={adminButton({ variant: 'ghost', size: 'icon' })}>
-                  <AdminIcon name="pencil" size={16} />
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => setDeleting(p)}
-                  aria-label={t.common.delete}
-                  title={t.common.delete}
-                  className={adminButton({ variant: 'dangerGhost', size: 'icon' })}
-                >
-                  <AdminIcon name="trash" size={16} />
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+                  </td>
+                  <td className="px-3 py-3 text-center max-lg:hidden">
+                    <Link
+                      href={`/admin/products/${p.id}#gallery`}
+                      className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-stone-600 tabular-nums transition-colors hover:bg-brand-50 hover:text-brand-700 dark:text-stone-300 dark:hover:bg-white/5 dark:hover:text-brand-300"
+                    >
+                      <AdminIcon name="image" size={15} />
+                      {p.imageCount}
+                    </Link>
+                  </td>
+                  <td className="px-3 py-3 text-center">
+                    <VisibilityToggle productId={p.id} initial={p.visible} />
+                  </td>
+                  <td className="py-3 ps-3 pe-5">
+                    <div className="flex items-center justify-end gap-1">
+                      <Link
+                        href={`/admin/products/${p.id}#gallery`}
+                        className={adminButton({ variant: 'secondary', size: 'sm', className: 'max-2xl:hidden' })}
+                      >
+                        <AdminIcon name="image" size={15} />
+                        {t.products.gallery}
+                      </Link>
+                      <Link
+                        href={`/admin/products/${p.id}#types`}
+                        className={adminButton({ variant: 'secondary', size: 'sm', className: 'me-1 max-2xl:hidden' })}
+                      >
+                        <AdminIcon name="layers" size={15} />
+                        {t.products.types}
+                      </Link>
+                      <a
+                        href={`/products/${p.slug}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={t.products.viewOnSite}
+                        title={t.products.viewOnSite}
+                        className={adminButton({ variant: 'ghost', size: 'icon' })}
+                      >
+                        <AdminIcon name="external" size={16} />
+                      </a>
+                      <Link href={`/admin/products/${p.id}`} aria-label={t.common.edit} title={t.common.edit} className={adminButton({ variant: 'ghost', size: 'icon' })}>
+                        <AdminIcon name="pencil" size={16} />
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => setDeleting(p)}
+                        aria-label={t.common.delete}
+                        title={t.common.delete}
+                        className={adminButton({ variant: 'dangerGhost', size: 'icon' })}
+                      >
+                        <AdminIcon name="trash" size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       <ConfirmDialog open={deleting !== null} onClose={() => setDeleting(null)} onConfirm={confirmDelete} pending={pending} />
