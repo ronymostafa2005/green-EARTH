@@ -146,17 +146,28 @@ export async function getSiteSection(key: SiteSectionKey): Promise<SectionConten
 
 /* ---------- Banner ---------- */
 
-export async function getHeroBanner() {
+export type HeroSlide = {
+  id: number;
+  title: string | null;
+  subtitle: string | null;
+  image: string | null;
+  buttonText: string | null;
+  link: string | null;
+};
+
+export async function getHeroSlides(): Promise<HeroSlide[]> {
   const page = await load<PaginatedList<Banner>>('Banner/GetPaginatedList', ['banners'], { pageNumber: 1, pageSize: 20, isActive: true });
-  const banner = (page?.data ?? []).filter((b) => b.isActive !== false && filled(b.title)).sort(byOrder)[0];
-  if (!banner) return null;
-  return {
-    title: banner.title!.trim(),
-    subtitle: banner.subtitle?.trim() || null,
-    image: apiAssetUrl(banner.image),
-    buttonText: banner.buttonText?.trim() || null,
-    link: safeHref(banner.link),
-  };
+  return (page?.data ?? [])
+    .filter((b) => b.isActive !== false && (filled(b.title) || filled(b.image)))
+    .sort(byOrder)
+    .map((b) => ({
+      id: b.id,
+      title: b.title?.trim() || null,
+      subtitle: b.subtitle?.trim() || null,
+      image: apiAssetUrl(b.image),
+      buttonText: b.buttonText?.trim() || null,
+      link: safeHref(b.link),
+    }));
 }
 
 /* ---------- Social media ---------- */
