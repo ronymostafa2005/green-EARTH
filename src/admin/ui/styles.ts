@@ -7,6 +7,10 @@ const buttonVariants = {
   ghost: 'text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-white/10',
   danger: 'bg-red-600 text-white hover:bg-red-700',
   dangerGhost: 'text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10',
+  brandGhost: 'text-brand-700 hover:bg-brand-50 dark:text-brand-300 dark:hover:bg-brand-500/10',
+  /** For dark (brand-950) surfaces in both themes. */
+  inverse: 'bg-white text-brand-900 shadow-sm hover:bg-brand-50',
+  glass: 'text-white ring-1 ring-white/25 hover:bg-white/10',
 };
 
 const buttonSizes = {
@@ -14,6 +18,7 @@ const buttonSizes = {
   md: 'h-10 px-4 text-sm',
   lg: 'h-12 px-5 text-sm',
   icon: 'size-9',
+  iconLg: 'size-[42px]',
 };
 
 export function adminButton({

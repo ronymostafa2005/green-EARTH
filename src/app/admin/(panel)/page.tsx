@@ -94,11 +94,11 @@ export default async function OverviewPage() {
         <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">{greeting}</h1>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/70 sm:text-base">{t.overview.subtitle}</p>
         <div className="mt-7 flex flex-wrap gap-2">
-          <Link href="/admin/products/new" className={adminButton({ className: 'bg-white text-brand-900 hover:bg-brand-50 dark:bg-white dark:text-brand-900 dark:hover:bg-brand-50' })}>
+          <Link href="/admin/products/new" className={adminButton({ variant: 'inverse' })}>
             <AdminIcon name="plus" />
             {t.overview.addProduct}
           </Link>
-          <a href="/" target="_blank" rel="noreferrer" className={adminButton({ variant: 'ghost', className: 'text-white ring-1 ring-white/25 hover:bg-white/10 dark:text-white' })}>
+          <a href="/" target="_blank" rel="noreferrer" className={adminButton({ variant: 'glass' })}>
             <AdminIcon name="external" size={16} />
             {t.common.viewSite}
           </a>

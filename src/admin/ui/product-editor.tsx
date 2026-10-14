@@ -140,7 +140,7 @@ export function ProductVarieties({ productId, varieties }: { productId: number; 
           placeholder={t.products.addPlaceholder}
           className={inputStyles}
         />
-        <button type="button" onClick={add} disabled={pending || !draft.trim()} aria-label={t.common.add} className={adminButton({ size: 'icon', className: 'size-[42px]' })}>
+        <button type="button" onClick={add} disabled={pending || !draft.trim()} aria-label={t.common.add} className={adminButton({ size: 'iconLg' })}>
           {pending ? <Spinner /> : <AdminIcon name="plus" />}
         </button>
       </div>
@@ -216,7 +216,7 @@ export function ProductLinks({ productId, kind, items, options }: { productId: n
           onClick={add}
           disabled={pending || (!choice && !newName.trim())}
           aria-label={t.common.add}
-          className={adminButton({ size: 'icon', className: 'size-[42px]' })}
+          className={adminButton({ size: 'iconLg' })}
         >
           {pending ? <Spinner /> : <AdminIcon name="plus" />}
         </button>

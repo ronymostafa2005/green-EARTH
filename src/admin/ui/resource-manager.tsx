@@ -120,7 +120,7 @@ function RowActions({ categoryId, onEdit, onDelete }: { categoryId?: number; onE
             <AdminIcon name="plus" size={15} />
             {t.products.addToCategory}
           </Link>
-          <Link href={`/admin/products?category=${categoryId}`} className={adminButton({ variant: 'ghost', size: 'sm', className: 'text-brand-700 dark:text-brand-300' })}>
+          <Link href={`/admin/products?category=${categoryId}`} className={adminButton({ variant: 'brandGhost', size: 'sm' })}>
             <AdminIcon name="box" size={15} />
             {t.products.viewProducts}
           </Link>
