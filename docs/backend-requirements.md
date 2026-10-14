@@ -12,15 +12,15 @@ Base URL: `https://clinicaipoweredsystem.runasp.net/api/v1/`
 
 ---
 
-## 1) حاجات عاجلة (بدونها مش هنقدر نجرب الداشبورد)
+## 1) الصلاحيات وتسجيل الدخول
 
 | # | المطلوب | التفاصيل |
 |---|---|---|
-| 1 | **حساب أدمن شغال** | `Authentication/SignIn` بالحساب اللي اتبعت بيرجع `404 Data Not Found` — محتاجين حساب أدمن موجود فعلًا. |
-| 2 | **شكل رد SignIn** | الفرونت بيدور على التوكن في `data` (string) أو `data.accessToken` / `data.token`. يُفضّل يرجع: `{ accessToken, expiresAt, user: { name, email, profileImageUrl } }`. |
-| 3 | **Refresh Token** (اختياري) | `Authentication/RefreshToken` — لو مش موجود، الأدمن هيعمل login تاني لما التوكن يخلص. |
-| 4 | **الـ GET العامة بدون توكن** `[AllowAnonymous]` | `Product/GetPaginatedList`, `Product/GetById/{id}`, `ProductCategory/GetPaginatedList`, `Certification/GetPaginatedList`, `Exhibition/GetPaginatedList`, `ContactUs/Create`, وكل endpoints "محتوى الموقع" الجديدة (قسم 4). |
-| 5 | **باقي العمليات بتوكن أدمن فقط** | كل `Create / Update / HardDelete` و `ContactUs/GetPaginatedList`. |
+| 1 | **الـ GET العامة بدون توكن** `[AllowAnonymous]` | `Product/GetPaginatedList`, `Product/GetById/{id}`, `ProductCategory/GetPaginatedList`, `Certification/GetPaginatedList`, `Exhibition/GetPaginatedList`, `ContactUs/Create`، وكل endpoints "محتوى الموقع" الجديدة (قسم 4). |
+| 2 | **باقي العمليات بتوكن أدمن فقط** | كل `Create / Update / HardDelete` و `ContactUs/GetPaginatedList`. |
+| 3 | **Rate limit على SignIn** | حاليًا بيقفل بسرعة ("عدد كبير جدًا من الطلبات") — يُفضّل مثلًا 10 محاولات / 15 دقيقة. |
+| 4 | **حساب الأدمن النهائي للعميل** | حساب باسم الشركة (مش حساب تجربة) بصلاحيات كاملة على كل الـ entities. |
+| 5 | **Refresh Token** (اختياري) | `Authentication/RefreshToken` — لو مش موجود، الأدمن هيعمل login تاني لما التوكن يخلص. |
 
 ---
 
@@ -60,8 +60,8 @@ Base URL: `https://clinicaipoweredsystem.runasp.net/api/v1/`
 ### Product
 | الحقل / الـ Endpoint | ليه |
 |---|---|
-| `showOnHome: bool` (في Create و Update والـ response) | زرار "view home Page — Show / Un Show" اللي كان في الداشبورد القديم. |
-| `PUT Product/ToggleShowOnHome/{id}` (أو من خلال `Update`) | تبديل سريع من جدول المنتجات. |
+| `showOnHome: bool` في response الـ `GetPaginatedList` و `GetById` (default = true) | زرار "view home Page — Show / Un Show" اللي كان في الداشبورد القديم. **الفرونت جاهز** — الزرار بيشتغل لوحده أول ما الحقل يظهر في الـ response. |
+| `PUT Product/ToggleShowOnHome/{id}` (بدون body — يقلب القيمة) | **ده الاسم اللي الفرونت بيناديه بالظبط.** |
 | `displayOrder: int` | ترتيب المنتجات في الموقع. |
 | `slug: string` (unique، إنجليزي) | لينك المنتج في الموقع `/products/{slug}` — حاليًا بنولّده من الاسم. |
 | فلاتر في `GetPaginatedList`: `productCategoryId`, `showOnHome` | الصفحة الرئيسية وتابات الأقسام. |
@@ -163,7 +163,7 @@ PUT  CompanySettings/Update
 
 ## 6) ملخص سريع بالأولوية
 
-1. حساب أدمن شغال + تأكيد شكل رد `SignIn`. **(عاجل)**
+1. الـ GET العامة بدون توكن + حساب الأدمن النهائي للعميل.
 2. تأكيد إن الـ endpoints في قسم 2 شغالة بتوكن الأدمن + فلتر `productId` في جداول الربط.
 3. `Product.showOnHome` + `ContactUs.createdAt / isRead`.
 4. Endpoints محتوى الموقع: `SiteSection`, `Banner`, `SocialMedia`, `MetaTag`, `CompanySettings`.

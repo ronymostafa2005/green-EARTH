@@ -56,7 +56,7 @@ export function ImageInput({ name, currentUrl, label }: { name: string; currentU
         {shown ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={shown} alt="" className="absolute inset-0 size-full object-contain p-4" />
+            <img src={shown} alt="" className="absolute inset-0 size-full object-contain p-4 transition-transform duration-500 ease-out group-hover:scale-110" />
             <span className="absolute inset-x-3 bottom-3 rounded-xl bg-stone-950/70 px-3 py-2 text-xs font-semibold text-white opacity-0 backdrop-blur transition group-hover:opacity-100">
               {t.fields.replaceImage}
             </span>
@@ -120,7 +120,7 @@ export function MultiImageInput({ files, onChange }: { files: File[]; onChange: 
             <li key={`${file.name}-${i}`} className="group relative aspect-square overflow-hidden rounded-xl bg-stone-100 ring-1 ring-stone-200 dark:bg-white/5 dark:ring-white/10">
               {urls[i] && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={urls[i]} alt="" className="size-full object-contain p-2" />
+                <img src={urls[i]} alt="" className="size-full object-contain p-2 transition-transform duration-500 ease-out group-hover:scale-110" />
               )}
               {i === 0 && (
                 <span className="absolute start-1.5 top-1.5 rounded-md bg-brand-600 px-1.5 py-0.5 text-[10px] font-bold text-white">1</span>

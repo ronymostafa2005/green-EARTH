@@ -45,7 +45,7 @@ export function ProductGallery({ productId, images }: { productId: number; image
           {images.map((image, i) => (
             <li key={image.id} className="group relative aspect-square overflow-hidden rounded-2xl bg-stone-50 ring-1 ring-stone-200/70 dark:bg-white/5 dark:ring-white/10">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={image.url} alt="" loading="lazy" className="size-full object-contain p-2" />
+              <img src={image.url} alt="" loading="lazy" className="size-full object-contain p-2 transition-transform duration-500 ease-out group-hover:scale-110" />
               {i === 0 && (
                 <span className="absolute start-2 top-2 rounded-md bg-brand-600 px-1.5 py-0.5 text-[10px] font-bold text-white">1</span>
               )}

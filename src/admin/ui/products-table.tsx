@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { cn } from '@/lib/utils';
-import { deleteProduct } from '../actions';
+import { deleteProduct, toggleShowOnHome } from '../actions';
 import type { Option } from '../products';
 import { adminButton, ConfirmDialog, EmptyState, SearchInput, surface } from './controls';
 import { AdminIcon } from './icon';
@@ -19,7 +19,54 @@ type ProductRow = {
   thumbnail: string | null;
   imageCount: number;
   slug: string;
+  /** Null until the backend sends the flag. */
+  showOnHome: boolean | null;
 };
+
+function HomeToggle({ productId, initial }: { productId: number; initial: boolean | null }) {
+  const { t, toast } = useAdmin();
+  const [shown, setShown] = useState(initial);
+  const [pending, startTransition] = useTransition();
+
+  if (shown === null) {
+    return (
+      <span
+        title={t.products.homeFlagPending}
+        className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1.5 text-xs font-semibold text-stone-400 dark:bg-white/5 dark:text-stone-500"
+      >
+        <AdminIcon name="eye" size={14} />
+        {t.products.show}
+      </span>
+    );
+  }
+
+  const toggle = () =>
+    startTransition(async () => {
+      setShown(!shown);
+      const result = await toggleShowOnHome(productId);
+      if (!result.ok) setShown(shown);
+      toast(result.ok, result.message);
+    });
+
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      disabled={pending}
+      aria-pressed={shown}
+      title={shown ? t.products.shownHint : t.products.hiddenHint}
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ring-1 transition-all duration-200 active:scale-95 disabled:opacity-60',
+        shown
+          ? 'bg-brand-50 text-brand-700 ring-brand-600/20 hover:bg-brand-100 dark:bg-brand-500/10 dark:text-brand-300 dark:ring-brand-400/20'
+          : 'bg-red-50 text-red-600 ring-red-600/15 hover:bg-red-100 dark:bg-red-500/10 dark:text-red-400 dark:ring-red-400/20',
+      )}
+    >
+      <span className={cn('size-1.5 rounded-full', shown ? 'bg-brand-500' : 'bg-red-500', pending && 'animate-pulse')} />
+      {shown ? t.products.show : t.products.unShow}
+    </button>
+  );
+}
 
 export function ProductsTable({
   products,
@@ -122,7 +169,7 @@ export function ProductsTable({
               className={cn('flex items-center gap-4 rounded-2xl p-3 pe-4 transition hover:-translate-y-px hover:ring-brand-500/30 dark:hover:ring-white/15', surface)}
             >
               <Link href={`/admin/products/${p.id}`} className="flex min-w-0 flex-1 items-center gap-4">
-                <span className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-brand-50 to-sand-100/70 dark:from-white/5 dark:to-white/[0.02]">
+                <span className="relative z-0 size-16 shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-brand-50 to-sand-100/70 transition-all duration-300 ease-out hover:z-20 hover:scale-[1.9] hover:bg-white hover:shadow-[0_18px_40px_-12px_rgb(19_33_13/0.45)] hover:ring-1 hover:ring-brand-950/10 ltr:origin-left rtl:origin-right dark:from-white/5 dark:to-white/[0.02] dark:hover:bg-stone-800">
                   {p.thumbnail ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={p.thumbnail} alt="" loading="lazy" className="size-full object-contain p-1.5" />
@@ -145,6 +192,10 @@ export function ProductsTable({
                   </span>
                 </span>
               </Link>
+              <div className="flex flex-col items-center gap-1 px-2">
+                <span className="text-[10px] font-semibold tracking-wide text-stone-400 uppercase max-sm:hidden">{t.products.homePage}</span>
+                <HomeToggle productId={p.id} initial={p.showOnHome} />
+              </div>
               <div className="flex items-center gap-1">
                 <Link
                   href={`/admin/products/${p.id}#gallery`}

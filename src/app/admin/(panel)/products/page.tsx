@@ -46,6 +46,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             categoryName: p.productCategoryName,
             thumbnail: images[0]?.url ?? null,
             imageCount: images.length,
+            showOnHome: typeof p.showOnHome === 'boolean' ? p.showOnHome : null,
             slug: productSlug(p),
           };
         })}

@@ -143,6 +143,7 @@ function fromApi(product: ApiProduct): Product {
     specs: specs.length ? specs : local?.specs,
     packing: packing.length ? packing : undefined,
     harvestMonths: harvestMonths.length ? harvestMonths : undefined,
+    showOnHome: typeof product.showOnHome === 'boolean' ? product.showOnHome : undefined,
   };
 }
 

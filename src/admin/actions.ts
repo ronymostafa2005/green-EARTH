@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { redirect, unstable_rethrow } from 'next/navigation';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { API_BASE_URL, ApiError } from '@/lib/api';
-import { createItem, deleteItem, listAll, updateItem } from './api';
+import { adminRequest, createItem, deleteItem, listAll, updateItem } from './api';
 import { dictionaries, isLocale, isTheme } from './i18n';
 import { isProductLinkKind, isResourceKey, productLinks, resources, type Row } from './resources';
 import {
@@ -244,6 +244,16 @@ export async function deleteProduct(id: number): Promise<ActionResult> {
     await deleteItem('Product', id);
     refresh(['products'], ...productPaths());
     return success('deleted');
+  } catch (error) {
+    return errorResult(error);
+  }
+}
+
+export async function toggleShowOnHome(id: number): Promise<ActionResult> {
+  try {
+    await adminRequest(`Product/ToggleShowOnHome/${id}`, { method: 'PUT' });
+    refresh(['products'], ...productPaths(id));
+    return success('saved');
   } catch (error) {
     return errorResult(error);
   }

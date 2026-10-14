@@ -29,6 +29,8 @@ export type Product = {
   packing?: string[];
   /** Month numbers 1–12 */
   harvestMonths?: number[];
+  /** Undefined when the backend does not send the flag. */
+  showOnHome?: boolean;
 };
 
 export type NavLink = {

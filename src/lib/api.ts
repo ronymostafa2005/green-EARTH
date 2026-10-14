@@ -66,6 +66,8 @@ export type ApiProduct = {
   vitamins: ApiNamedItem[] | null;
   minerals: ApiNamedItem[] | null;
   harvestMonths: ApiHarvestMonth[] | null;
+  /** Not returned until the backend adds the home-page flag. */
+  showOnHome?: boolean | null;
 };
 
 export type ApiProductImage = {

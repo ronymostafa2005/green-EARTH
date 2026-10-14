@@ -145,7 +145,12 @@ export function ResourceManager({ resourceKey, rows }: { resourceKey: ResourceKe
               <div className="relative m-2 mb-0 aspect-[16/10] overflow-hidden rounded-[1.25rem] bg-gradient-to-br from-brand-50 via-[#f6f4ec] to-sand-100/70 dark:from-white/[0.05] dark:via-white/[0.03] dark:to-white/[0.02]">
                 {row.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={row.imageUrl} alt="" loading="lazy" className="size-full object-contain p-6" />
+                  <img
+                    src={row.imageUrl}
+                    alt=""
+                    loading="lazy"
+                    className="size-full object-contain p-6 transition-transform duration-500 ease-out group-hover:scale-110"
+                  />
                 ) : (
                   <span className="grid size-full place-items-center text-stone-300 dark:text-stone-600">
                     <AdminIcon name="image" size={32} />
