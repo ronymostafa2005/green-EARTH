@@ -6,8 +6,7 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import { API_BASE_URL, ApiError } from '@/lib/api';
 import { slugify } from '@/lib/content';
 import { metaPages, siteSectionKeys, type SiteSectionKey } from '@/lib/site-content';
-import { setProductHidden } from '@/lib/visibility';
-import { adminRequest, createItem, deleteItem, listAll, updateItem } from './api';
+import { adminRequest, createItem, deleteItem, getById, listAll, updateItem } from './api';
 import { dictionaries, isLocale, isTheme } from './i18n';
 import { isProductLinkKind, isResourceKey, productLinks, resources, type Row } from './resources';
 import {
@@ -261,16 +260,14 @@ export async function deleteProduct(id: number): Promise<ActionResult> {
 
 export async function setProductVisibility(id: number, visible: boolean): Promise<ActionResult> {
   try {
-    await setProductHidden(id, !visible);
+    const product = await getById<{ showOnHome?: boolean | null }>('Product', id);
+    if (!!product?.showOnHome !== visible) {
+      await adminRequest(`Product/ToggleShowOnHome/${id}`, { method: 'PUT' });
+    }
     refresh(['products'], ...productPaths(id), '/', '/products', '/sitemap.xml');
     revalidatePath('/products/[slug]', 'page');
     return success('saved');
   } catch (error) {
-    const code = (error as NodeJS.ErrnoException).code;
-    if (code === 'EROFS' || code === 'EACCES' || code === 'EPERM') {
-      console.error('[admin] visibility storage is read-only — connect Upstash Redis', error);
-      return { ok: false, message: (await getDictionary()).products.storageMissing, at: Date.now() };
-    }
     return errorResult(error);
   }
 }

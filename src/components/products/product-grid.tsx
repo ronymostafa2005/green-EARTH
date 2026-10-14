@@ -33,6 +33,14 @@ export function ProductGrid({ products, categories, limit, syncUrl = false }: Pr
   const filtered = active === 'all' ? products : products.filter((p) => p.category === active);
   const visible = limit ? filtered.slice(0, limit) : filtered;
 
+  if (!products.length) {
+    return (
+      <p className="rounded-3xl bg-white px-6 py-14 text-center text-ink/60 ring-1 ring-ink/5">
+        Our product range is being updated — please check back soon or contact us for the current availability.
+      </p>
+    );
+  }
+
   return (
     <div>
       <div className="-mx-5 overflow-x-auto px-5 [scrollbar-width:none] sm:mx-0 sm:px-0">

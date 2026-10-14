@@ -7,7 +7,6 @@ import { adminButton } from '@/admin/ui/styles';
 import { AdminIcon } from '@/admin/ui/icon';
 import { PageHeader } from '@/admin/ui/page-header';
 import { ProductsTable } from '@/admin/ui/products-table';
-import { getHiddenProductIds } from '@/lib/visibility';
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getDictionary()).products.title };
@@ -18,7 +17,7 @@ type ProductsPageProps = { searchParams: Promise<{ created?: string; category?: 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const { created, category } = await searchParams;
   const t = await getDictionary();
-  const [products, categories, hidden] = await Promise.all([listAll<ProductDetail>('Product'), listAll('ProductCategory'), getHiddenProductIds()]);
+  const [products, categories] = await Promise.all([listAll<ProductDetail>('Product'), listAll('ProductCategory')]);
 
   return (
     <>
@@ -47,7 +46,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             categoryName: p.productCategoryName,
             thumbnail: images[0]?.url ?? null,
             imageCount: images.length,
-            visible: !hidden.has(p.id),
+            visible: !!p.showOnHome,
             slug: productSlug(p),
           };
         })}

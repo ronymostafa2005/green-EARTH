@@ -40,13 +40,13 @@ export function AdminProvider({ locale, theme, children }: { locale: Locale; the
   return (
     <AdminContext.Provider value={value}>
       {children}
-      <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-6 z-[100] flex flex-col items-center gap-2 px-4">
+      <div aria-live="polite" className="pointer-events-none fixed inset-x-0 top-5 z-[100] flex flex-col items-center gap-2 px-4">
         {toasts.map((item) => (
           <div
             key={item.id}
             role={item.ok ? 'status' : 'alert'}
             className={cn(
-              'pointer-events-auto flex max-w-md animate-fade-in items-start gap-3 rounded-2xl px-4 py-3 text-sm font-medium shadow-[0_18px_40px_-16px_rgb(0_0_0/0.35)] ring-1',
+              'pointer-events-auto flex max-w-md animate-toast-in items-start gap-3 rounded-2xl px-4 py-3 text-sm font-medium shadow-[0_18px_40px_-16px_rgb(0_0_0/0.35)] ring-1',
               item.ok
                 ? 'bg-white text-stone-800 ring-stone-200 dark:bg-stone-800 dark:text-stone-100 dark:ring-white/10'
                 : 'bg-red-50 text-red-800 ring-red-200 dark:bg-red-950 dark:text-red-100 dark:ring-red-900',

@@ -8,6 +8,7 @@ import { loadProductCatalog } from '@/lib/content';
 
 export async function FeaturedProducts() {
   const { products, categories } = await loadProductCatalog();
+  if (!products.length) return null;
 
   return (
     <Section className="bg-cream">
