@@ -36,38 +36,32 @@ function VisibilityToggle({ productId, initial }: { productId: number; initial: 
     });
 
   return (
-    <button
-      type="button"
-      onClick={toggle}
-      disabled={pending}
-      aria-pressed={shown}
-      title={shown ? t.products.shownHint : t.products.hiddenHint}
-      className={cn(
-        'group inline-flex h-9 min-w-[7.5rem] cursor-pointer items-center justify-between gap-2.5 rounded-xl px-3 text-[13px] font-semibold shadow-sm ring-1 transition-all duration-200 ring-inset hover:-translate-y-px hover:shadow-md active:translate-y-0 active:scale-[0.97] disabled:cursor-wait disabled:opacity-70',
-        shown
-          ? 'bg-brand-50 text-brand-800 ring-brand-600/30 hover:bg-brand-100 dark:bg-brand-500/15 dark:text-brand-200 dark:ring-brand-400/30 dark:hover:bg-brand-500/25'
-          : 'bg-red-50 text-red-700 ring-red-400/40 hover:bg-red-100 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-400/30 dark:hover:bg-red-500/20',
-      )}
-    >
-      <span className="flex items-center gap-1.5">
-        <AdminIcon name={shown ? 'eye' : 'eyeOff'} size={15} className={cn(pending && 'animate-pulse')} />
-        {shown ? t.products.show : t.products.unShow}
-      </span>
+    <div className="inline-flex items-center gap-2.5">
       <span
-        aria-hidden
         className={cn(
-          'relative h-[18px] w-8 shrink-0 rounded-full transition-colors duration-200',
-          shown ? 'bg-brand-600 dark:bg-brand-500' : 'bg-red-300 dark:bg-red-500/50',
+          'inline-flex w-[4.75rem] items-center gap-1.5 text-xs font-semibold',
+          shown ? 'text-brand-700 dark:text-brand-300' : 'text-stone-500 dark:text-stone-400',
         )}
       >
-        <span
-          className={cn(
-            'absolute top-0.5 size-3.5 rounded-full bg-white shadow transition-all duration-200',
-            shown ? 'start-[calc(100%-1rem)]' : 'start-0.5',
-          )}
-        />
+        <span className={cn('size-2 shrink-0 rounded-full', shown ? 'bg-brand-500 shadow-[0_0_0_3px] shadow-brand-500/20' : 'bg-stone-400 dark:bg-stone-500')} />
+        {shown ? t.products.statusShown : t.products.statusHidden}
       </span>
-    </button>
+      <button
+        type="button"
+        onClick={toggle}
+        disabled={pending}
+        title={shown ? t.products.shownHint : t.products.hiddenHint}
+        className={cn(
+          'inline-flex h-9 min-w-[6.5rem] cursor-pointer items-center justify-center gap-1.5 rounded-xl px-3 text-[13px] font-semibold shadow-sm ring-1 transition-all duration-200 ring-inset hover:-translate-y-px hover:shadow-md active:translate-y-0 active:scale-[0.97] disabled:cursor-wait disabled:opacity-70',
+          shown
+            ? 'bg-red-50 text-red-700 ring-red-400/40 hover:bg-red-100 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-400/30 dark:hover:bg-red-500/20'
+            : 'bg-brand-600 text-white ring-brand-700/20 hover:bg-brand-700 dark:bg-brand-500 dark:text-brand-950 dark:ring-brand-400/30 dark:hover:bg-brand-400',
+        )}
+      >
+        <AdminIcon name={shown ? 'eyeOff' : 'eye'} size={15} className={cn(pending && 'animate-pulse')} />
+        {shown ? t.products.unShow : t.products.show}
+      </button>
+    </div>
   );
 }
 
@@ -166,7 +160,7 @@ export function ProductsTable({
         <EmptyState icon="search" title={t.common.noResults} />
       ) : (
         <div className={cn('overflow-x-auto rounded-3xl xl:overflow-visible', surface)}>
-          <table className="w-full min-w-[760px] text-sm">
+          <table className="w-full min-w-[820px] text-sm">
             <thead>
               <tr className="text-xs font-semibold text-brand-900/70 dark:text-stone-400">
                 {[
