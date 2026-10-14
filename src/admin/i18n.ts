@@ -91,6 +91,15 @@ const en = {
     logout: 'Sign out',
     brandTitle: 'Everything your website shows, in one place.',
     brandText: 'Products, certifications, exhibitions and customer messages — kept up to date in minutes.',
+    emailPlaceholder: 'name@company.com',
+    passwordPlaceholder: 'Enter your password',
+    secure: 'Secure, encrypted connection',
+    backToSite: 'Back to website',
+    features: [
+      { icon: 'box', title: 'Products & catalog', text: 'Photos, specifications and visibility.' },
+      { icon: 'fileText', title: 'Website content', text: 'Banner, sections, SEO and contact details.' },
+      { icon: 'inbox', title: 'Customer messages', text: 'Every enquiry from the contact form.' },
+    ] as { icon: 'box' | 'fileText' | 'inbox'; title: string; text: string }[],
   },
   fields: {
     name: 'Name',
@@ -355,6 +364,15 @@ const ar: Dictionary = {
     logout: 'تسجيل الخروج',
     brandTitle: 'كل محتوى موقعك في مكان واحد.',
     brandText: 'المنتجات والشهادات والمعارض ورسائل العملاء — حدّثها في دقائق.',
+    emailPlaceholder: 'name@company.com',
+    passwordPlaceholder: 'اكتب كلمة المرور',
+    secure: 'اتصال آمن ومشفّر',
+    backToSite: 'الرجوع للموقع',
+    features: [
+      { icon: 'box', title: 'المنتجات والكتالوج', text: 'الصور والمواصفات والظهور على الموقع.' },
+      { icon: 'fileText', title: 'محتوى الموقع', text: 'البانر والأقسام والسيو وبيانات التواصل.' },
+      { icon: 'inbox', title: 'رسائل العملاء', text: 'كل استفسار جاي من فورم التواصل.' },
+    ],
   },
   fields: {
     name: 'الاسم',

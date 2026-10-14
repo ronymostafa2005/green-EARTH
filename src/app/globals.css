@@ -31,6 +31,31 @@
   --animate-fade-in: fade-in 0.4s ease;
   --animate-shimmer: shimmer 3.5s linear infinite;
   --animate-border-spin: border-spin 4s linear infinite;
+  --animate-fade-up: fade-up 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-ken-burns: ken-burns 28s ease-in-out infinite alternate;
+  --animate-float: float 7s ease-in-out infinite;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+
+  @keyframes ken-burns {
+    from {
+      transform: scale(1.04);
+    }
+    to {
+      transform: scale(1.14) translate(-1.5%, -1%);
+    }
+  }
+
+  @keyframes float {
+    50% {
+      transform: translateY(-10px);
+    }
+  }
 
   @keyframes shimmer {
     from {
@@ -113,6 +138,29 @@
 
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-brand-500;
+  }
+
+  /* Browser autofill paints its own background; keep the text readable in both themes. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--color-ink);
+    caret-color: var(--color-ink);
+    box-shadow: 0 0 0 1000px #fbfcf9 inset;
+    transition: background-color 9999s ease-out;
+  }
+
+  .dark input:-webkit-autofill,
+  .dark input:-webkit-autofill:hover,
+  .dark input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #fafaf9;
+    caret-color: #fafaf9;
+    box-shadow: 0 0 0 1000px #1d211a inset;
+  }
+
+  .dark select option {
+    background-color: #1d211a;
+    color: #fafaf9;
   }
 }
 
