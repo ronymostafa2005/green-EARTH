@@ -1,5 +1,5 @@
 import { apiAssetUrl } from '@/lib/api';
-import { slugify } from '@/lib/content';
+import { productSlug } from '@/lib/content';
 import { tryListAll } from './api';
 import { productLinks, type ProductLinkKind, type Row } from './resources';
 
@@ -14,6 +14,9 @@ export type ProductDetail = Row & {
   descriptionLocalization: string | null;
   productCategoryId: number;
   productCategoryName: string | null;
+  slug?: string | null;
+  displayOrder?: number | null;
+  showOnHome?: boolean | null;
   images: { id: number; imagePath: string | null }[] | null;
   varieties: { id: number; name: string }[] | null;
   types: { id: number; name: string }[] | null;
@@ -28,9 +31,7 @@ const str = (v: unknown) => (typeof v === 'string' ? v : '');
 export const toOptions = (rows: Row[] | null): Option[] =>
   (rows ?? []).map((row) => ({ id: row.id, label: str(row.name) || str(row.nameLocalization), labelAr: str(row.nameLocalization) || str(row.name) }));
 
-export function productSlug(product: { id: number; name: string }) {
-  return slugify(product.name) || `product-${product.id}`;
-}
+export { productSlug };
 
 export function productImages(product: Pick<ProductDetail, 'images'>) {
   return [...(product.images ?? [])]

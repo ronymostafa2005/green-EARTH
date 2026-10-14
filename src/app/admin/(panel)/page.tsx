@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { unstable_rethrow } from 'next/navigation';
-import { countOf, listPage } from '@/admin/api';
+import { adminRequest, countOf, listPage } from '@/admin/api';
 import { formatDate, toMessage } from '@/admin/messages';
 import { getDictionary, getPrefs, getUser } from '@/admin/session';
 import { AdminIcon, type AdminIconName } from '@/admin/ui/icon';
@@ -31,29 +31,51 @@ const tones = {
   rose: { icon: 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300', glow: 'bg-rose-400' },
 };
 
-export default async function OverviewPage() {
-  const [t, { locale }, user] = await Promise.all([getDictionary(), getPrefs(), getUser()]);
+/** Reads a count from the Dashboard/Stats payload, whose exact keys the API does not document. */
+function pickStat(stats: unknown, include: RegExp, exclude?: RegExp) {
+  if (!stats || typeof stats !== 'object') return null;
+  const entry = Object.entries(stats).find(([key, value]) => typeof value === 'number' && include.test(key) && !exclude?.test(key));
+  return entry ? (entry[1] as number) : null;
+}
 
-  const [products, categories, certifications, exhibitions, messages] = await Promise.all([
-    settled(countOf('Product')),
-    settled(countOf('ProductCategory')),
-    settled(countOf('Certification')),
-    settled(countOf('Exhibition')),
+export default async function OverviewPage() {
+  const [t, { locale }, user, dashboard] = await Promise.all([getDictionary(), getPrefs(), getUser(), settled(adminRequest<unknown>('Dashboard/Stats'))]);
+
+  const count = (endpoint: string, include: RegExp, exclude?: RegExp) => {
+    const fromStats = pickStat(dashboard, include, exclude);
+    return fromStats !== null ? Promise.resolve(fromStats) : settled(countOf(endpoint));
+  };
+
+  const [products, categories, certifications, exhibitions, messages, unread] = await Promise.all([
+    count('Product', /product/i, /categor|image|type|variet/i),
+    count('ProductCategory', /categor/i),
+    count('Certification', /certif/i),
+    count('Exhibition', /exhibit/i),
     settled(listPage('ContactUs', { pageNumber: 1, pageSize: 5 })),
+    pickStat(dashboard, /unread/i) ?? settled(listPage('ContactUs', { pageNumber: 1, pageSize: 1, isRead: false }).then((r) => r?.totalCount ?? 0)),
   ]);
 
-  const stats: { label: string; value: number | null; href: string; icon: AdminIconName; tone: keyof typeof tones }[] = [
+  const stats: { label: string; value: number | null; hint?: string; href: string; icon: AdminIconName; tone: keyof typeof tones }[] = [
     { label: t.nav.products, value: products, href: '/admin/products', icon: 'box', tone: 'green' },
     { label: t.nav.categories, value: categories, href: '/admin/categories', icon: 'tag', tone: 'amber' },
     { label: t.nav.certifications, value: certifications, href: '/admin/certifications', icon: 'award', tone: 'sky' },
     { label: t.nav.exhibitions, value: exhibitions, href: '/admin/exhibitions', icon: 'calendar', tone: 'violet' },
-    { label: t.nav.messages, value: messages?.totalCount ?? null, href: '/admin/messages', icon: 'inbox', tone: 'rose' },
+    {
+      label: t.nav.messages,
+      value: messages?.totalCount ?? pickStat(dashboard, /message|contact/i, /unread/i),
+      hint: unread ? `${unread} ${t.messages.unread}` : undefined,
+      href: unread ? '/admin/messages?filter=unread' : '/admin/messages',
+      icon: 'inbox',
+      tone: 'rose',
+    },
   ];
 
   const quickActions: { label: string; href: string; icon: AdminIconName; tone: keyof typeof tones }[] = [
     { label: t.overview.addProduct, href: '/admin/products/new', icon: 'box', tone: 'green' },
     { label: t.overview.addCertification, href: '/admin/certifications', icon: 'award', tone: 'sky' },
     { label: t.overview.addExhibition, href: '/admin/exhibitions', icon: 'calendar', tone: 'violet' },
+    { label: t.nav.banner, href: '/admin/banners', icon: 'megaphone', tone: 'amber' },
+    { label: t.nav.settings, href: '/admin/settings', icon: 'settings', tone: 'rose' },
   ];
 
   const recent = (messages?.data ?? []).map(toMessage);
@@ -99,7 +121,12 @@ export default async function OverviewPage() {
               </span>
               <span>
                 <span className="block text-3xl font-bold tracking-tight text-brand-950 tabular-nums dark:text-white">{stat.value ?? '—'}</span>
-                <span className="mt-1 block text-sm font-medium text-stone-500 dark:text-stone-400">{stat.label}</span>
+                <span className="mt-1 flex flex-wrap items-center gap-2 text-sm font-medium text-stone-500 dark:text-stone-400">
+                  {stat.label}
+                  {stat.hint && (
+                    <span className="rounded-full bg-rose-500 px-2 py-0.5 text-[11px] font-bold text-white">{stat.hint}</span>
+                  )}
+                </span>
               </span>
             </Link>
           </li>
@@ -128,12 +155,13 @@ export default async function OverviewPage() {
               {recent.map((m) => (
                 <li key={m.id}>
                   <Link href="/admin/messages" className="flex items-start gap-3 rounded-2xl px-2 py-3 transition hover:bg-brand-50/60 dark:hover:bg-white/[0.03]">
-                    <span className="grid size-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-brand-400 to-brand-700 text-sm font-bold text-white uppercase">
+                    <span className="relative grid size-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-brand-400 to-brand-700 text-sm font-bold text-white uppercase">
                       {(m.name || m.email).charAt(0)}
+                      {!m.isRead && <span className="absolute -end-0.5 -top-0.5 size-3 rounded-full bg-rose-500 ring-2 ring-white dark:ring-[#171a14]" />}
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="flex items-baseline justify-between gap-3">
-                        <span className="truncate text-sm font-semibold">{m.name || m.email}</span>
+                        <span className={cn('truncate text-sm', m.isRead ? 'font-semibold' : 'font-bold')}>{m.name || m.email}</span>
                         {formatDate(m.date, locale) && <span className="shrink-0 text-xs text-stone-400">{formatDate(m.date, locale)}</span>}
                       </span>
                       <span className="block truncate text-sm text-stone-500 dark:text-stone-400">{m.subject || m.message}</span>

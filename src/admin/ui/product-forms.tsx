@@ -84,6 +84,7 @@ export function ProductCreateForm({
             <CategorySelect categories={categories} defaultValue={defaultCategoryId} />
           </div>
           <BilingualField name="description" label={t.fields.description} multiline />
+          <OrderFields />
         </div>
       </Card>
 
@@ -135,19 +136,46 @@ export function ProductCreateForm({
   );
 }
 
+function OrderFields({ slug, displayOrder }: { slug?: string; displayOrder?: number | null }) {
+  const { t } = useAdmin();
+  return (
+    <div className="grid gap-4 sm:grid-cols-[1fr_12rem]">
+      <Field label={t.fields.slug} hint={t.fields.slugHint}>
+        <input name="slug" dir="ltr" defaultValue={slug} placeholder="iqf-strawberry" className={inputStyles} />
+      </Field>
+      <Field label={t.fields.displayOrder}>
+        <input name="displayOrder" type="number" min={0} defaultValue={displayOrder ?? 0} className={inputStyles} />
+      </Field>
+    </div>
+  );
+}
+
 export function ProductBasicsForm({
   product,
   categories,
 }: {
-  product: { id: number; name: string; nameLocalization: string | null; description: string | null; descriptionLocalization: string | null; productCategoryId: number };
+  product: {
+    id: number;
+    name: string;
+    nameLocalization: string | null;
+    description: string | null;
+    descriptionLocalization: string | null;
+    productCategoryId: number;
+    slug?: string | null;
+    displayOrder?: number | null;
+    showOnHome?: boolean | null;
+  };
   categories: Option[];
 }) {
   const { t } = useAdmin();
   const [state, onSubmit, pending] = useFormSubmit(updateProduct.bind(null, product.id));
   useResultToast(state);
+  const customSlug = product.slug && !/^product-\d+$/.test(product.slug) ? product.slug : '';
 
   return (
     <form onSubmit={onSubmit}>
+      <input type="hidden" name="currentSlug" value={product.slug ?? ''} />
+      <input type="hidden" name="showOnHome" value={String(!!product.showOnHome)} />
       <Card>
         <CardTitle title={t.products.basicInfo} />
         <div className="grid gap-5">
@@ -161,6 +189,7 @@ export function ProductBasicsForm({
             multiline
             defaultValues={{ en: product.description, ar: product.descriptionLocalization }}
           />
+          <OrderFields slug={customSlug} displayOrder={product.displayOrder} />
         </div>
         <div className="mt-6 flex justify-end border-t border-stone-100 pt-5 dark:border-white/5">
           <button type="submit" disabled={pending} className={adminButton()}>

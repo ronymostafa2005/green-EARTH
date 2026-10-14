@@ -12,6 +12,21 @@ Base URL: `https://clinicaipoweredsystem.runasp.net/api/v1/`
 
 ---
 
+## ✅ حالة التنفيذ (14 أكتوبر 2026)
+
+اتربط في الداشبورد والموقع: `SiteSection`, `Banner`, `SocialMedia`, `MetaTag`, `CompanySettings`, `Dashboard/Stats`, `ContactUs/MarkAsRead` + فلتر `isRead`, و `Product.slug / displayOrder`.
+
+**لسه ناقص / محتاج تأكيد:**
+
+1. **"Product Creative With"** — لسه مش موجود في الباك (قسم 3).
+2. **`Dashboard/Stats`** — ابعتوا شكل الـ response بالظبط (أسماء الحقول). الداشبورد حاليًا بيقرأ أي رقم اسمه فيه product / categor / certif / exhibit / unread، ولو مش لاقي بيحسب بنفسه.
+3. **`SiteSection/Update` و `MetaTag/Update`** — لو اتبعت من غير `ImageFile` / `OgImageFile`، لازم الصورة القديمة **تفضل زي ما هي** (متتمسحش).
+4. **`Product.slug`** — القيمة الافتراضية `product-{id}`؛ لما الأدمن يكتب slug لازم يكون unique ويرجع خطأ واضح لو متكرر.
+5. **`ContactUs`** — تأكيد إن `createdAt` و `isRead` راجعين في `GetPaginatedList`.
+6. **`captchaToken`** في `ContactUs/Create` — لو هيبقى إجباري، ابعتوا نوع الكابتشا (reCAPTCHA / Turnstile) والـ site key عشان نضيفه في الفورم.
+
+---
+
 ## 1) الصلاحيات وتسجيل الدخول
 
 | # | المطلوب | التفاصيل |

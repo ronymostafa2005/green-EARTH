@@ -4,8 +4,10 @@ import { cookies } from 'next/headers';
 import { redirect, unstable_rethrow } from 'next/navigation';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { API_BASE_URL, ApiError } from '@/lib/api';
+import { slugify } from '@/lib/content';
+import { metaPages, siteSectionKeys, type SiteSectionKey } from '@/lib/site-content';
 import { setProductHidden } from '@/lib/visibility';
-import { createItem, deleteItem, listAll, updateItem } from './api';
+import { adminRequest, createItem, deleteItem, listAll, updateItem } from './api';
 import { dictionaries, isLocale, isTheme } from './i18n';
 import { isProductLinkKind, isResourceKey, productLinks, resources, type Row } from './resources';
 import {
@@ -153,10 +155,12 @@ export async function saveResource(key: string, _prev: ActionResult, formData: F
   const id = Number(formData.get('id')) || undefined;
 
   try {
-    const values: Record<string, string> = {};
+    const values: Record<string, string | number | boolean> = {};
     for (const field of config.fields) {
       if (field.type === 'image') continue;
-      values[field.key] = text(formData, field.key);
+      if (field.type === 'boolean') values[field.key] = formData.get(field.key) === 'on';
+      else if (field.type === 'number') values[field.key] = Number(text(formData, field.key)) || 0;
+      else values[field.key] = text(formData, field.key);
       if (field.localized) values[`${field.key}Localization`] = text(formData, `${field.key}Localization`);
     }
 
@@ -166,7 +170,7 @@ export async function saveResource(key: string, _prev: ActionResult, formData: F
     } else {
       const form = new FormData();
       if (id) form.append('Id', String(id));
-      Object.entries(values).forEach(([k, v]) => form.append(pascal(k), v));
+      Object.entries(values).forEach(([k, v]) => form.append(pascal(k), String(v)));
       const [file] = files(formData, 'image');
       if (file && config.fileField) form.append(config.fileField, file);
       body = form;
@@ -203,6 +207,8 @@ export async function createProduct(_prev: ActionResult, formData: FormData): Pr
     form.append('Description', text(formData, 'description'));
     form.append('DescriptionLocalization', text(formData, 'descriptionLocalization'));
     form.append('ProductCategoryId', text(formData, 'productCategoryId'));
+    form.append('DisplayOrder', String(Number(text(formData, 'displayOrder')) || 0));
+    if (slugify(text(formData, 'slug'))) form.append('Slug', slugify(text(formData, 'slug')));
     files(formData, 'images').forEach((file) => form.append('Images', file));
     for (const [from, to] of [
       ['varieties', 'VarietyNames'],
@@ -232,6 +238,9 @@ export async function updateProduct(id: number, _prev: ActionResult, formData: F
       description: text(formData, 'description'),
       descriptionLocalization: text(formData, 'descriptionLocalization'),
       productCategoryId: Number(formData.get('productCategoryId')),
+      slug: slugify(text(formData, 'slug')) || text(formData, 'currentSlug') || undefined,
+      displayOrder: Number(text(formData, 'displayOrder')) || 0,
+      showOnHome: text(formData, 'showOnHome') === 'true',
     });
     refresh(['products'], ...productPaths(id));
     return success('saved');
@@ -364,7 +373,109 @@ export async function toggleHarvestMonth(productId: number, code: number, linkId
   }
 }
 
+/* ---------- Website content ---------- */
+
+const sectionPaths: Record<SiteSectionKey, string[]> = {
+  welcome: ['/'],
+  about: ['/about'],
+  quality: ['/quality'],
+  export: ['/export'],
+};
+
+export async function saveSiteSection(key: string, _prev: ActionResult, formData: FormData): Promise<ActionResult> {
+  if (!(siteSectionKeys as readonly string[]).includes(key)) return { ok: false, at: Date.now() };
+  try {
+    const form = new FormData();
+    form.append('Key', key);
+    form.append('Title', text(formData, 'title'));
+    form.append('TitleLocalization', text(formData, 'titleLocalization'));
+    form.append('Details', text(formData, 'details'));
+    form.append('DetailsLocalization', text(formData, 'detailsLocalization'));
+    const [file] = files(formData, 'image');
+    if (file) form.append('ImageFile', file);
+
+    const titles = formData.getAll('itemTitle').map(String);
+    let count = 0;
+    titles.forEach((title, i) => {
+      const values = {
+        Title: title.trim(),
+        TitleLocalization: String(formData.getAll('itemTitleLocalization')[i] ?? '').trim(),
+        Description: String(formData.getAll('itemDescription')[i] ?? '').trim(),
+        DescriptionLocalization: String(formData.getAll('itemDescriptionLocalization')[i] ?? '').trim(),
+        Icon: String(formData.getAll('itemIcon')[i] ?? '').trim(),
+      };
+      if (!values.Title && !values.TitleLocalization) return;
+      Object.entries(values).forEach(([k, v]) => form.append(`Items[${count}].${k}`, v));
+      count++;
+    });
+    form.append('ClearItems', String(count === 0));
+
+    await adminRequest('SiteSection/Update', { method: 'PUT', form });
+    refresh(['site-sections', `section-${key}`], `/admin/sections/${key}`, ...sectionPaths[key as SiteSectionKey]);
+    return success('saved');
+  } catch (error) {
+    return errorResult(error);
+  }
+}
+
+export async function saveMetaTag(page: string, _prev: ActionResult, formData: FormData): Promise<ActionResult> {
+  if (!(metaPages as readonly string[]).includes(page)) return { ok: false, at: Date.now() };
+  try {
+    const form = new FormData();
+    form.append('Page', page);
+    form.append('Title', text(formData, 'title'));
+    form.append('TitleLocalization', text(formData, 'titleLocalization'));
+    form.append('Description', text(formData, 'description'));
+    form.append('DescriptionLocalization', text(formData, 'descriptionLocalization'));
+    form.append('Keywords', formData.getAll('keywords').map(String).map((k) => k.trim()).filter(Boolean).join(', '));
+    const [file] = files(formData, 'image');
+    if (file) form.append('OgImageFile', file);
+
+    await adminRequest('MetaTag/Update', { method: 'PUT', form });
+    refresh(['meta-tags', `meta-${page}`], '/admin/seo');
+    revalidatePath('/', 'layout');
+    return success('saved');
+  } catch (error) {
+    return errorResult(error);
+  }
+}
+
+export async function saveCompanySettings(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+  const list = (key: string) => formData.getAll(key).map(String).map((v) => v.trim()).filter(Boolean);
+  try {
+    await adminRequest('CompanySettings/Update', {
+      method: 'PUT',
+      json: {
+        phones: list('phones'),
+        emails: list('emails'),
+        whatsapp: text(formData, 'whatsapp').replace(/\D/g, ''),
+        address: text(formData, 'address'),
+        addressLocalization: text(formData, 'addressLocalization'),
+        mapUrl: text(formData, 'mapUrl'),
+        workingHours: text(formData, 'workingHours'),
+        workingHoursLocalization: text(formData, 'workingHoursLocalization'),
+        notificationEmail: text(formData, 'notificationEmail'),
+      },
+    });
+    refresh(['company-settings', 'social'], '/admin/settings');
+    revalidatePath('/', 'layout');
+    return success('saved');
+  } catch (error) {
+    return errorResult(error);
+  }
+}
+
 /* ---------- Messages ---------- */
+
+export async function markMessageRead(id: number): Promise<ActionResult> {
+  try {
+    await adminRequest(`ContactUs/MarkAsRead/${id}`, { method: 'PUT' });
+    refresh([], '/admin/messages', '/admin');
+    return { ok: true, at: Date.now() };
+  } catch (error) {
+    return errorResult(error);
+  }
+}
 
 export async function deleteMessage(id: number): Promise<ActionResult> {
   try {

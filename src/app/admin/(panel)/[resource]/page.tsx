@@ -22,6 +22,7 @@ export default async function ResourcePage({ params }: ResourcePageProps) {
   const config = resources[resource];
   const t = await getDictionary();
   const rows = await listAll(config.endpoint);
+  if (config.fields.some((f) => f.key === 'displayOrder')) rows.sort((a, b) => Number(a.displayOrder ?? 0) - Number(b.displayOrder ?? 0));
 
   return (
     <>

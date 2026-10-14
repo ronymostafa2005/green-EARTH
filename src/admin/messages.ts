@@ -11,5 +11,13 @@ export function formatDate(value: string | null, locale: string) {
 
 export function toMessage(row: Record<string, unknown> & { id: number }): Message {
   const date = ['createdAt', 'createdDate', 'creationDate', 'date', 'sentAt'].map((k) => str(row[k])).find(Boolean);
-  return { id: row.id, name: str(row.name), email: str(row.email), subject: str(row.subject), message: str(row.message), date: date || null };
+  return {
+    id: row.id,
+    name: str(row.name),
+    email: str(row.email),
+    subject: str(row.subject),
+    message: str(row.message),
+    date: date || null,
+    isRead: row.isRead !== false,
+  };
 }

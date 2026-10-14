@@ -8,9 +8,9 @@ import { Container } from '@/components/ui/container';
 import { Icon } from '@/components/ui/icon';
 import { Section } from '@/components/ui/section';
 import { SectionHeading } from '@/components/ui/section-heading';
-import { siteConfig } from '@/config/site';
 import { packingSizes } from '@/data/products';
 import { loadProduct, loadProductCatalog } from '@/lib/content';
+import { getContactInfo } from '@/lib/site-content';
 import { cn, whatsappLink } from '@/lib/utils';
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -39,7 +39,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const product = await loadProduct((await params).slug);
   if (!product) notFound();
 
-  const { products } = await loadProductCatalog();
+  const [{ products }, contact] = await Promise.all([loadProductCatalog(), getContactInfo()]);
   const others = products.filter((p) => p.slug !== product.slug);
   const related = [
     ...others.filter((p) => p.category === product.category),
@@ -134,7 +134,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   <Icon name="arrow" />
                 </ButtonLink>
                 <a
-                  href={whatsappLink(siteConfig.contact.whatsapp, `Hello, I'm interested in ${product.name}.`)}
+                  href={whatsappLink(contact.whatsapp, `Hello, I'm interested in ${product.name}.`)}
                   target="_blank"
                   rel="noreferrer"
                   className={buttonStyles({ variant: 'outline', size: 'lg' })}

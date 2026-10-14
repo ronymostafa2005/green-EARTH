@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Container } from '@/components/ui/container';
 import { Section } from '@/components/ui/section';
 import { SectionHeading } from '@/components/ui/section-heading';
@@ -8,6 +9,11 @@ import { Hero } from '@/components/sections/hero';
 import { Marquee } from '@/components/sections/marquee';
 import { ProcessSteps } from '@/components/sections/process-steps';
 import { WhyUs } from '@/components/sections/why-us';
+import { pageMetadata } from '@/lib/site-content';
+
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata('home', {});
+}
 
 export default function HomePage() {
   return (

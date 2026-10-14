@@ -1,10 +1,14 @@
+import Image from 'next/image';
 import { ButtonLink } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { Icon } from '@/components/ui/icon';
 import { Eyebrow } from '@/components/ui/section-heading';
 import { stats } from '@/data/company';
+import { getHeroBanner } from '@/lib/site-content';
 
-export function Hero() {
+export async function Hero() {
+  const banner = await getHeroBanner();
+
   return (
     <section className="relative isolate overflow-hidden pt-10 pb-20 sm:pt-16 lg:pb-28">
       <div
@@ -16,16 +20,22 @@ export function Hero() {
         <div>
           <Eyebrow>Premium IQF · Made in Egypt</Eyebrow>
           <h1 className="mt-7 text-shimmer pb-2 text-5xl leading-[1.02] font-semibold tracking-tight text-balance sm:text-6xl xl:text-7xl">
-            Egypt’s harvest, <em className="text-shimmer font-serif font-normal text-brand-600">frozen</em> at its peak.
+            {banner ? (
+              banner.title
+            ) : (
+              <>
+                Egypt’s harvest, <em className="text-shimmer font-serif font-normal text-brand-600">frozen</em> at its peak.
+              </>
+            )}
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink/60">
-            Demeter Green Earth grows, freezes and exports premium fruits and vegetables from Egypt’s most fertile
-            lands to tables around the world.
+            {banner?.subtitle ??
+              'Demeter Green Earth grows, freezes and exports premium fruits and vegetables from Egypt’s most fertile lands to tables around the world.'}
           </p>
 
           <div className="mt-9 flex flex-wrap gap-3">
-            <ButtonLink href="/products" size="lg">
-              Explore products
+            <ButtonLink href={banner?.link ?? '/products'} size="lg">
+              {banner?.buttonText ?? 'Explore products'}
               <Icon name="arrow" />
             </ButtonLink>
             <ButtonLink href="/contact" variant="outline" size="lg">
@@ -45,18 +55,22 @@ export function Hero() {
 
         <div className="relative">
           <div className="relative aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-brand-900 sm:aspect-square lg:aspect-[4/5]">
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              poster="/images/products/strawberries.jpg"
-              aria-hidden
-              className="absolute inset-0 size-full scale-110 object-cover"
-            >
-              <source src="/videos/hero.mp4" type="video/mp4" />
-            </video>
+            {banner?.image ? (
+              <Image src={banner.image} alt="" fill priority sizes="(min-width: 1024px) 45vw, 100vw" className="object-cover" />
+            ) : (
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                poster="/images/products/strawberries.jpg"
+                aria-hidden
+                className="absolute inset-0 size-full scale-110 object-cover"
+              >
+                <source src="/videos/hero.mp4" type="video/mp4" />
+              </video>
+            )}
             <div className="absolute inset-0 bg-linear-to-t from-brand-950/70 via-transparent to-transparent" />
 
             <div className="absolute inset-x-5 bottom-5 flex items-center gap-4 rounded-3xl border border-white/20 bg-white/15 p-4 text-white backdrop-blur-md sm:inset-x-6 sm:bottom-6">

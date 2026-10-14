@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { Container } from '@/components/ui/container';
+import { Icon, type IconName } from '@/components/ui/icon';
 import { Section } from '@/components/ui/section';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { cn } from '@/lib/utils';
@@ -33,5 +34,23 @@ export function MediaSplit({ image, imageAlt, eyebrow, title, reverse, children 
         </div>
       </Container>
     </Section>
+  );
+}
+
+export function MediaChecklist({ items }: { items: { title: string; text: string; icon?: IconName }[] }) {
+  return (
+    <ul className="space-y-4 pt-4">
+      {items.map((item) => (
+        <li key={item.title} className="flex gap-4">
+          <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-brand-500 text-white">
+            <Icon name={item.icon ?? 'check'} size={14} />
+          </span>
+          <p>
+            <strong className="block font-semibold text-ink">{item.title}</strong>
+            {item.text}
+          </p>
+        </li>
+      ))}
+    </ul>
   );
 }

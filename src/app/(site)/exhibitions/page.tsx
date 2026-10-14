@@ -7,11 +7,14 @@ import { SectionHeading } from '@/components/ui/section-heading';
 import { CtaSection } from '@/components/sections/cta-section';
 import { PageHero } from '@/components/sections/page-hero';
 import { loadExhibitions } from '@/lib/content';
+import { pageMetadata } from '@/lib/site-content';
 
-export const metadata: Metadata = {
-  title: 'Exhibitions',
-  description: 'Meet Demeter Green Earth at international food exhibitions.',
-};
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata('exhibitions', {
+    title: 'Exhibitions',
+    description: 'Meet Demeter Green Earth at international food exhibitions.',
+  });
+}
 
 export default async function ExhibitionsPage() {
   const exhibitions = await loadExhibitions();

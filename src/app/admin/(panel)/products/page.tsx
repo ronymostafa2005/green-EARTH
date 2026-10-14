@@ -37,7 +37,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         created={created === '1'}
         initialCategory={categories.some((c) => c.id === Number(category)) ? Number(category) : 'all'}
         categories={toOptions(categories)}
-        products={products.map((p) => {
+        products={products.sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0) || a.id - b.id).map((p) => {
           const images = productImages(p);
           return {
             id: p.id,

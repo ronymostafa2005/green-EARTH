@@ -37,6 +37,19 @@ export function Field({
   );
 }
 
+export function Switch({ name, label, defaultChecked }: { name: string; label: React.ReactNode; defaultChecked?: boolean }) {
+  return (
+    <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-stone-200/90 bg-[#fbfcf9] px-3.5 py-2.5 dark:border-white/10 dark:bg-white/[0.04]">
+      <span className="text-[13px] font-semibold text-stone-700 dark:text-stone-300">{label}</span>
+      <input type="checkbox" name={name} defaultChecked={defaultChecked} className="peer sr-only" />
+      <span
+        aria-hidden
+        className="relative h-6 w-11 shrink-0 rounded-full bg-stone-300 transition-colors peer-checked:bg-brand-600 peer-focus-visible:ring-4 peer-focus-visible:ring-brand-500/25 after:absolute after:top-0.5 after:start-0.5 after:size-5 after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:after:translate-x-5 rtl:peer-checked:after:-translate-x-5 dark:bg-white/15"
+      />
+    </label>
+  );
+}
+
 /** English + Arabic inputs for a field that has a `…Localization` twin. */
 export function BilingualField({
   name,
@@ -44,16 +57,20 @@ export function BilingualField({
   multiline,
   required,
   defaultValues,
+  rows = 4,
+  hint,
 }: {
   name: string;
   label: string;
   multiline?: boolean;
   required?: boolean;
   defaultValues?: { en?: string | null; ar?: string | null };
+  rows?: number;
+  hint?: React.ReactNode;
 }) {
   const { t } = useAdmin();
   const Input = multiline ? 'textarea' : 'input';
-  const extra = multiline ? { rows: 4, className: cn(inputStyles, 'resize-y leading-relaxed') } : { className: inputStyles };
+  const extra = multiline ? { rows, className: cn(inputStyles, 'resize-y leading-relaxed') } : { className: inputStyles };
 
   return (
     <fieldset className="grid gap-3 sm:grid-cols-2">
@@ -64,6 +81,7 @@ export function BilingualField({
       <Field label={`${label} · ${t.common.arabic}`}>
         <Input name={`${name}Localization`} dir="rtl" lang="ar" defaultValue={defaultValues?.ar ?? ''} {...extra} />
       </Field>
+      {hint && <p className="-mt-1 text-xs text-stone-500 sm:col-span-2 dark:text-stone-400">{hint}</p>}
     </fieldset>
   );
 }

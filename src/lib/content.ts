@@ -84,6 +84,13 @@ export const slugify = (value: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 
+/** Uses the slug set in the dashboard; the API's placeholder `product-{id}` falls back to the name. */
+export function productSlug(product: { id: number; name: string; slug?: string | null }) {
+  const custom = slugify(product.slug ?? '');
+  if (custom && !/^product-\d+$/.test(custom)) return custom;
+  return slugify(product.name) || `product-${product.id}`;
+}
+
 const sameText = (a: string | null | undefined, b: string | null | undefined) =>
   !!a && !!b && a.trim().toLowerCase() === b.trim().toLowerCase();
 
@@ -135,7 +142,7 @@ function fromApi(product: ApiProduct): Product {
 
   return {
     id: product.id,
-    slug: slugify(product.name) || `product-${product.id}`,
+    slug: productSlug(product),
     name: product.name,
     category: category.id,
     categoryLabel: category.label,
@@ -159,7 +166,10 @@ export const loadProductCatalog = cache(async (): Promise<ProductCatalog> => {
     const [apiProducts, hidden] = await Promise.all([getAllProducts(), getHiddenProductIds()]);
     if (!apiProducts.length) return localCatalog();
 
-    const products = apiProducts.filter((p) => !hidden.has(p.id)).map(fromApi);
+    const products = apiProducts
+      .filter((p) => !hidden.has(p.id))
+      .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0) || a.id - b.id)
+      .map(fromApi);
     const order = (id: string) => {
       const index = localCategories.findIndex((c) => c.id === id);
       return index === -1 ? localCategories.length : index;

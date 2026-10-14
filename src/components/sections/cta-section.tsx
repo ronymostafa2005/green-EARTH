@@ -4,10 +4,12 @@ import { Container } from '@/components/ui/container';
 import { Icon } from '@/components/ui/icon';
 import { Section } from '@/components/ui/section';
 import { Eyebrow } from '@/components/ui/section-heading';
-import { siteConfig } from '@/config/site';
+import { getContactInfo } from '@/lib/site-content';
 import { whatsappLink } from '@/lib/utils';
 
-export function CtaSection() {
+export async function CtaSection() {
+  const { whatsapp } = await getContactInfo();
+
   return (
     <Section spacing="compactTop">
       <Container>
@@ -29,7 +31,7 @@ export function CtaSection() {
                 <Icon name="arrow" />
               </ButtonLink>
               <a
-                href={whatsappLink(siteConfig.contact.whatsapp)}
+                href={whatsappLink(whatsapp)}
                 target="_blank"
                 rel="noreferrer"
                 className={buttonStyles({ variant: 'glass', size: 'lg' })}

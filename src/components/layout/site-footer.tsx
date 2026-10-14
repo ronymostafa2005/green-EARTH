@@ -2,10 +2,11 @@ import Link from 'next/link';
 import { Logo } from './logo';
 import { Container } from '@/components/ui/container';
 import { Icon } from '@/components/ui/icon';
-import { footerNav, siteConfig, socialLinks } from '@/config/site';
+import { footerNav, siteConfig } from '@/config/site';
+import { getContactInfo, getSocialLinks } from '@/lib/site-content';
 
-export function SiteFooter() {
-  const { contact } = siteConfig;
+export async function SiteFooter() {
+  const [contact, socialLinks] = await Promise.all([getContactInfo(), getSocialLinks()]);
 
   return (
     <footer className="overflow-hidden bg-brand-950 text-white">
@@ -17,9 +18,9 @@ export function SiteFooter() {
               Premium IQF frozen fruits and vegetables, grown in Egypt’s fertile lands and delivered to tables around
               the world.
             </p>
-            <ul className="mt-7 flex gap-2">
+            <ul className="mt-7 flex flex-wrap gap-2">
               {socialLinks.map((social) => (
-                <li key={social.label}>
+                <li key={social.href}>
                   <a
                     href={social.href}
                     target="_blank"
@@ -57,7 +58,7 @@ export function SiteFooter() {
                 {contact.address}
               </li>
               <li>
-                <a href={`tel:${contact.phone}`} className="flex gap-3 transition-colors hover:text-white">
+                <a href={`tel:${contact.phone.replace(/\s+/g, '')}`} className="flex gap-3 transition-colors hover:text-white">
                   <Icon name="phone" size={18} className="shrink-0 text-brand-400" />
                   {contact.phone}
                 </a>

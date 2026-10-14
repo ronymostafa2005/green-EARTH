@@ -5,11 +5,14 @@ import { SectionHeading } from '@/components/ui/section-heading';
 import { CertificateGrid } from '@/components/sections/certificate-grid';
 import { CtaSection } from '@/components/sections/cta-section';
 import { PageHero } from '@/components/sections/page-hero';
+import { pageMetadata } from '@/lib/site-content';
 
-export const metadata: Metadata = {
-  title: 'Certifications',
-  description: 'Demeter Green Earth is certified ISO 9001:2015 and ISO 22000, and registered with the U.S. FDA.',
-};
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata('certifications', {
+    title: 'Certifications',
+    description: 'Demeter Green Earth is certified ISO 9001:2015 and ISO 22000, and registered with the U.S. FDA.',
+  });
+}
 
 export default function CertificationsPage() {
   return (

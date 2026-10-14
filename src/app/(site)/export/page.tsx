@@ -4,17 +4,28 @@ import { Icon } from '@/components/ui/icon';
 import { Section } from '@/components/ui/section';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { CtaSection } from '@/components/sections/cta-section';
-import { MediaSplit } from '@/components/sections/media-split';
+import { MediaChecklist, MediaSplit } from '@/components/sections/media-split';
 import { PageHero } from '@/components/sections/page-hero';
 import { ProcessSteps } from '@/components/sections/process-steps';
 import { exportReasons, markets } from '@/data/company';
+import { getSiteSection, pageMetadata } from '@/lib/site-content';
 
-export const metadata: Metadata = {
-  title: 'Export & Production',
-  description: 'Harvested at the right moment and frozen within hours — premium Egyptian produce exported worldwide.',
-};
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata('export', {
+    title: 'Export & Production',
+    description: 'Harvested at the right moment and frozen within hours — premium Egyptian produce exported worldwide.',
+  });
+}
 
-export default function ExportPage() {
+export default async function ExportPage() {
+  const section = await getSiteSection('export');
+  const paragraphs = section?.paragraphs.length
+    ? section.paragraphs
+    : [
+        'Every product we export reflects our dedication to quality and freshness. Our fruits and vegetables retain their authentic taste, colour and nutrition from the field to your warehouse.',
+      ];
+  const reasons = section?.items.length ? section.items.map((item) => ({ title: item.title, text: item.description, icon: item.icon })) : exportReasons;
+
   return (
     <>
       <PageHero
@@ -23,32 +34,21 @@ export default function ExportPage() {
       />
 
       <MediaSplit
-        image="/images/pages/export.jpg"
+        image={section?.image ?? '/images/pages/export.jpg'}
         imageAlt="Bags of frozen mixed vegetables"
         eyebrow="Export"
         title={
-          <>
-            Why partners choose <em>Demeter Green</em>
-          </>
+          section?.title ?? (
+            <>
+              Why partners choose <em>Demeter Green</em>
+            </>
+          )
         }
       >
-        <p>
-          Every product we export reflects our dedication to quality and freshness. Our fruits and vegetables retain
-          their authentic taste, colour and nutrition from the field to your warehouse.
-        </p>
-        <ul className="space-y-4 pt-4">
-          {exportReasons.map((reason) => (
-            <li key={reason.title} className="flex gap-4">
-              <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-brand-500 text-white">
-                <Icon name="check" size={14} />
-              </span>
-              <p>
-                <strong className="block font-semibold text-ink">{reason.title}</strong>
-                {reason.text}
-              </p>
-            </li>
-          ))}
-        </ul>
+        {paragraphs.map((text) => (
+          <p key={text}>{text}</p>
+        ))}
+        <MediaChecklist items={reasons} />
       </MediaSplit>
 
       <ProcessSteps />

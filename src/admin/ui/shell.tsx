@@ -43,13 +43,14 @@ const navGroups: { label?: keyof Dictionary['nav']; items: NavItem[] }[] = [
   {
     label: 'siteContent',
     items: [
-      { href: '#banner', icon: 'megaphone', label: 'banner', soon: true },
-      { href: '#welcome', icon: 'hand', label: 'welcome', soon: true },
-      { href: '#about', icon: 'fileText', label: 'about', soon: true },
-      { href: '#quality', icon: 'shield', label: 'quality', soon: true },
-      { href: '#export', icon: 'factory', label: 'export', soon: true },
-      { href: '#social', icon: 'share', label: 'social', soon: true },
-      { href: '#seo', icon: 'globe', label: 'seo', soon: true },
+      { href: '/admin/banners', icon: 'megaphone', label: 'banner' },
+      { href: '/admin/sections/welcome', icon: 'hand', label: 'welcome' },
+      { href: '/admin/sections/about', icon: 'fileText', label: 'about' },
+      { href: '/admin/sections/quality', icon: 'shield', label: 'quality' },
+      { href: '/admin/sections/export', icon: 'factory', label: 'export' },
+      { href: '/admin/social', icon: 'share', label: 'social' },
+      { href: '/admin/seo', icon: 'globe', label: 'seo' },
+      { href: '/admin/settings', icon: 'settings', label: 'settings' },
     ],
   },
 ];

@@ -7,14 +7,26 @@ import { Eyebrow, SectionHeading } from '@/components/ui/section-heading';
 import { CtaSection } from '@/components/sections/cta-section';
 import { PageHero } from '@/components/sections/page-hero';
 import { coreValues, promises, stats } from '@/data/company';
+import { getSiteSection, pageMetadata } from '@/lib/site-content';
 
-export const metadata: Metadata = {
-  title: 'About us',
-  description:
-    'Demeter Green Earth is a trusted Egyptian manufacturer and exporter of premium IQF frozen fruits and vegetables.',
-};
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata('about', {
+    title: 'About us',
+    description:
+      'Demeter Green Earth is a trusted Egyptian manufacturer and exporter of premium IQF frozen fruits and vegetables.',
+  });
+}
 
-export default function AboutPage() {
+const defaultParagraphs = [
+  'Since our establishment, we’ve been driven by one clear mission — to deliver natural freshness from Egypt’s farms to tables around the world.',
+  'Through advanced IQF technology, strict quality control and sustainable sourcing, DGE guarantees products that retain their authentic flavour, colour and nutrition.',
+];
+
+export default async function AboutPage() {
+  const section = await getSiteSection('about');
+  const paragraphs = section?.paragraphs.length ? section.paragraphs : defaultParagraphs;
+  const values = section?.items.length ? section.items.map((item) => ({ icon: item.icon, title: item.title, text: item.description })) : coreValues;
+
   return (
     <>
       <PageHero
@@ -27,18 +39,17 @@ export default function AboutPage() {
           <div>
             <Eyebrow>Who we are</Eyebrow>
             <p className="mt-7 text-2xl leading-snug font-medium tracking-tight text-balance sm:text-3xl">
-              Demeter Green is a trusted Egyptian company specialized in manufacturing and exporting premium{' '}
-              <em className="font-serif font-normal text-brand-600">IQF frozen</em> fruits and vegetables.
+              {section?.title ?? (
+                <>
+                  Demeter Green is a trusted Egyptian company specialized in manufacturing and exporting premium{' '}
+                  <em className="font-serif font-normal text-brand-600">IQF frozen</em> fruits and vegetables.
+                </>
+              )}
             </p>
             <div className="mt-8 space-y-4 leading-relaxed text-ink/65">
-              <p>
-                Since our establishment, we’ve been driven by one clear mission — to deliver natural freshness from
-                Egypt’s farms to tables around the world.
-              </p>
-              <p>
-                Through advanced IQF technology, strict quality control and sustainable sourcing, DGE guarantees
-                products that retain their authentic flavour, colour and nutrition.
-              </p>
+              {paragraphs.map((text) => (
+                <p key={text}>{text}</p>
+              ))}
             </div>
 
             <dl className="mt-10 grid grid-cols-3 gap-4">
@@ -53,7 +64,7 @@ export default function AboutPage() {
 
           <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem]">
             <Image
-              src="/images/pages/about.jpg"
+              src={section?.image ?? '/images/pages/about.jpg'}
               alt="A young tree growing from soil held in a hand"
               fill
               sizes="(max-width: 1024px) 100vw, 45vw"
@@ -68,14 +79,20 @@ export default function AboutPage() {
           <SectionHeading
             eyebrow="What drives us"
             title={
-              <>
-                Four values, <em>one direction</em>
-              </>
+              values === coreValues ? (
+                <>
+                  Four values, <em>one direction</em>
+                </>
+              ) : (
+                <>
+                  Our values, <em>one direction</em>
+                </>
+              )
             }
             description="Guided by our values, we continuously expand our reach and strengthen long-term partnerships across global markets."
           />
           <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {coreValues.map((value) => (
+            {values.map((value) => (
               <li key={value.title} className="rounded-[2rem] bg-white p-8">
                 <span className="grid size-12 place-items-center rounded-2xl bg-brand-50 text-brand-700">
                   <Icon name={value.icon} size={22} />

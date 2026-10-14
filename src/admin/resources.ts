@@ -1,19 +1,48 @@
-export type FieldType = 'text' | 'textarea' | 'image';
+import { socialPlatforms } from '@/lib/site-content';
+
+export type FieldType = 'text' | 'textarea' | 'image' | 'url' | 'number' | 'boolean' | 'select';
+
+export type FieldKey =
+  | 'name'
+  | 'description'
+  | 'location'
+  | 'year'
+  | 'image'
+  | 'title'
+  | 'subtitle'
+  | 'buttonText'
+  | 'link'
+  | 'displayOrder'
+  | 'isActive'
+  | 'platform'
+  | 'url';
 
 export type ResourceField = {
-  key: 'name' | 'description' | 'location' | 'year' | 'image';
+  key: FieldKey;
   type: FieldType;
   /** Also edits `${key}Localization` (Arabic). */
   localized?: boolean;
   required?: boolean;
+  options?: readonly string[];
 };
 
-export type ResourceKey = 'categories' | 'certifications' | 'exhibitions' | 'types' | 'packing-types' | 'vitamins' | 'minerals';
+export type ResourceKey =
+  | 'categories'
+  | 'certifications'
+  | 'exhibitions'
+  | 'types'
+  | 'packing-types'
+  | 'vitamins'
+  | 'minerals'
+  | 'banners'
+  | 'social';
 
 export type ResourceConfig = {
   endpoint: string;
   body: 'json' | 'form';
   fields: ResourceField[];
+  /** Field shown as the row title (defaults to `name`). */
+  titleKey?: FieldKey;
   /** Multipart field name for the uploaded file. */
   fileField?: string;
   /** Response field that holds the image path. */
@@ -26,6 +55,8 @@ export type ResourceConfig = {
 const name: ResourceField = { key: 'name', type: 'text', localized: true, required: true };
 const description: ResourceField = { key: 'description', type: 'textarea', localized: true };
 const image: ResourceField = { key: 'image', type: 'image' };
+const displayOrder: ResourceField = { key: 'displayOrder', type: 'number' };
+const isActive: ResourceField = { key: 'isActive', type: 'boolean' };
 
 export const resources: Record<ResourceKey, ResourceConfig> = {
   categories: {
@@ -91,6 +122,32 @@ export const resources: Record<ResourceKey, ResourceConfig> = {
     view: 'grid',
     tags: ['products'],
   },
+  banners: {
+    endpoint: 'Banner',
+    body: 'form',
+    titleKey: 'title',
+    fields: [
+      { key: 'title', type: 'text', localized: true, required: true },
+      { key: 'subtitle', type: 'textarea', localized: true },
+      { key: 'buttonText', type: 'text', localized: true },
+      { key: 'link', type: 'text' },
+      displayOrder,
+      isActive,
+      image,
+    ],
+    fileField: 'ImageFile',
+    imageKey: 'image',
+    view: 'grid',
+    tags: ['banners'],
+  },
+  social: {
+    endpoint: 'SocialMedia',
+    body: 'json',
+    titleKey: 'platform',
+    fields: [{ key: 'platform', type: 'select', required: true, options: socialPlatforms }, { key: 'url', type: 'url', required: true }, displayOrder, isActive],
+    view: 'table',
+    tags: ['social'],
+  },
 };
 
 export const isResourceKey = (value: string): value is ResourceKey => value in resources;
@@ -110,14 +167,14 @@ export type Row = Record<string, unknown> & { id: number };
 
 const str = (value: unknown) => (typeof value === 'string' ? value : '');
 
-export function rowName(row: Row, locale: 'ar' | 'en') {
-  const en = str(row.name);
-  const ar = str(row.nameLocalization);
+export function rowName(row: Row, locale: 'ar' | 'en', titleKey: string = 'name') {
+  const en = str(row[titleKey]);
+  const ar = str(row[`${titleKey}Localization`]);
   return locale === 'ar' ? ar || en : en || ar;
 }
 
 export function rowImagePath(row: Row, imageKey?: string) {
   if (imageKey && typeof row[imageKey] === 'string') return row[imageKey] as string;
-  const entry = Object.entries(row).find(([k, v]) => /(url|path)$/i.test(k) && typeof v === 'string' && v);
+  const entry = Object.entries(row).find(([k, v]) => /(image|url|path)$/i.test(k) && k !== 'url' && typeof v === 'string' && v);
   return entry ? (entry[1] as string) : null;
 }

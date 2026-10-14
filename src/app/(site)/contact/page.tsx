@@ -1,32 +1,35 @@
 import type { Metadata } from 'next';
 import { ContactForm } from '@/components/forms/contact-form';
 import { Container } from '@/components/ui/container';
-import { Icon } from '@/components/ui/icon';
+import { Icon, type IconName } from '@/components/ui/icon';
 import { Section } from '@/components/ui/section';
 import { PageHero } from '@/components/sections/page-hero';
-import { siteConfig, socialLinks } from '@/config/site';
+import { getContactInfo, getSocialLinks, pageMetadata } from '@/lib/site-content';
 import { whatsappLink } from '@/lib/utils';
 
-export const metadata: Metadata = {
-  title: 'Contact us',
-  description: 'Get in touch with the Demeter Green Earth export team for offers, samples and partnerships.',
-};
-
-const { contact } = siteConfig;
-
-const details = [
-  { icon: 'pin', label: 'Visit us', value: contact.address },
-  { icon: 'phone', label: 'Call us', value: contact.phone, href: `tel:${contact.phone}` },
-  { icon: 'mail', label: 'Email us', value: contact.email, href: `mailto:${contact.email}` },
-  { icon: 'whatsapp', label: 'WhatsApp', value: 'Start a chat', href: whatsappLink(contact.whatsapp) },
-] as const;
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata('contact', {
+    title: 'Contact us',
+    description: 'Get in touch with the Demeter Green Earth export team for offers, samples and partnerships.',
+  });
+}
 
 type ContactPageProps = {
   searchParams: Promise<{ product?: string }>;
 };
 
+type Detail = { icon: IconName; label: string; value: string; href?: string };
+
 export default async function ContactPage({ searchParams }: ContactPageProps) {
-  const { product } = await searchParams;
+  const [{ product }, contact, socialLinks] = await Promise.all([searchParams, getContactInfo(), getSocialLinks()]);
+
+  const details: Detail[] = [
+    { icon: 'pin', label: 'Visit us', value: contact.address },
+    ...contact.phones.map((phone, i) => ({ icon: 'phone' as const, label: i === 0 ? 'Call us' : 'Or call', value: phone, href: `tel:${phone.replace(/\s+/g, '')}` })),
+    ...contact.emails.map((email, i) => ({ icon: 'mail' as const, label: i === 0 ? 'Email us' : 'Or email', value: email, href: `mailto:${email}` })),
+    { icon: 'whatsapp', label: 'WhatsApp', value: 'Start a chat', href: whatsappLink(contact.whatsapp) },
+    ...(contact.workingHours ? [{ icon: 'globe' as const, label: 'Working hours', value: contact.workingHours }] : []),
+  ];
 
   return (
     <>
@@ -49,18 +52,18 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
 
             <ul className="space-y-6">
               {details.map((item) => (
-                <li key={item.label} className="flex items-center gap-4">
+                <li key={`${item.label}-${item.value}`} className="flex items-center gap-4">
                   <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-white/10 text-brand-300">
                     <Icon name={item.icon} size={20} />
                   </span>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs font-semibold tracking-[0.14em] text-white/45 uppercase">{item.label}</p>
-                    {'href' in item ? (
+                    {item.href ? (
                       <a
                         href={item.href}
                         target={item.href.startsWith('http') ? '_blank' : undefined}
                         rel="noreferrer"
-                        className="mt-1 block transition-colors hover:text-brand-300"
+                        className="mt-1 block break-words transition-colors hover:text-brand-300"
                       >
                         {item.value}
                       </a>
@@ -72,9 +75,9 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
               ))}
             </ul>
 
-            <ul className="flex gap-2">
+            <ul className="flex flex-wrap gap-2">
               {socialLinks.map((social) => (
-                <li key={social.label}>
+                <li key={social.href}>
                   <a
                     href={social.href}
                     target="_blank"
@@ -94,13 +97,13 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
             <p className="mt-3 mb-8 leading-relaxed text-ink/60">
               Fill in the form and our export team will get back to you as soon as possible.
             </p>
-            <ContactForm product={product} />
+            <ContactForm product={product} email={contact.email} />
           </div>
         </Container>
 
         <Container className="mt-6">
           <iframe
-            src={siteConfig.mapEmbed}
+            src={contact.mapEmbed}
             title="Demeter Green Earth location"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"

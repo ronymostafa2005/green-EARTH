@@ -32,7 +32,7 @@ export async function adminRequest<T>(path: string, { method = 'GET', json, form
   return data?.data as T;
 }
 
-type ListFilters = Record<string, string | number | undefined>;
+type ListFilters = Record<string, string | number | boolean | undefined>;
 
 export function listPage<T = Row>(endpoint: string, filters: ListFilters & { pageNumber?: number; pageSize?: number } = {}) {
   return adminRequest<PaginatedList<T>>(`${endpoint}/GetPaginatedList`, {

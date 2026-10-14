@@ -59,6 +59,9 @@ export type ApiProduct = {
   descriptionLocalization: string | null;
   productCategoryId: number;
   productCategoryName: string | null;
+  slug?: string | null;
+  displayOrder?: number | null;
+  showOnHome?: boolean | null;
   images: ApiProductImage[] | null;
   varieties: ApiNamedItem[] | null;
   types: ApiNamedItem[] | null;

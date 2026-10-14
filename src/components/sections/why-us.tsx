@@ -4,6 +4,7 @@ import { Icon, type IconName } from '@/components/ui/icon';
 import { Section } from '@/components/ui/section';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { markets } from '@/data/company';
+import { getSiteSection } from '@/lib/site-content';
 import { cn } from '@/lib/utils';
 
 function FeatureCard({ icon, title, text, className }: { icon: IconName; title: string; text: string; className: string }) {
@@ -20,7 +21,17 @@ function FeatureCard({ icon, title, text, className }: { icon: IconName; title: 
   );
 }
 
-export function WhyUs() {
+const defaultCards: { icon: IconName; title: string; description: string }[] = [
+  { icon: 'snowflake', title: 'Advanced IQF', description: 'Freshness, flavour and texture perfectly preserved.' },
+  { icon: 'shield', title: 'Strict quality control', description: 'Certified processes from farm to freezer.' },
+  { icon: 'globe', title: 'Global experience', description: 'A trusted exporter across four regions — and reaching new markets every season.' },
+];
+
+export async function WhyUs() {
+  const section = await getSiteSection('welcome');
+  const cards = defaultCards.map((card, i) => section?.items[i] ?? card);
+  const [intro, highlight] = section?.paragraphs ?? [];
+
   return (
     <Section>
       <Container>
@@ -29,21 +40,23 @@ export function WhyUs() {
             align="start"
             eyebrow="Why Demeter Green"
             title={
-              <>
-                From fertile land to your freezer, <em>without compromise</em>
-              </>
+              section?.title ?? (
+                <>
+                  From fertile land to your freezer, <em>without compromise</em>
+                </>
+              )
             }
           />
           <p className="max-w-sm leading-relaxed text-ink/60">
-            Every product we export reflects our dedication to quality and freshness — the true essence of Egypt’s
-            fertile lands.
+            {intro ??
+              'Every product we export reflects our dedication to quality and freshness — the true essence of Egypt’s fertile lands.'}
           </p>
         </div>
 
         <div className="mt-14 grid gap-4 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-[repeat(2,minmax(250px,auto))]">
           <article className="relative min-h-[420px] overflow-hidden sm:min-h-[340px] rounded-[2rem] md:col-span-2 lg:row-span-2">
             <Image
-              src="/images/pages/quality.jpg"
+              src={section?.image ?? '/images/pages/quality.jpg'}
               alt="A basket of fresh Egyptian vegetables"
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -53,33 +66,21 @@ export function WhyUs() {
             <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-10">
               <h3 className="text-2xl font-semibold sm:text-3xl">Premium Egyptian quality</h3>
               <p className="mt-3 max-w-md leading-relaxed text-white/75">
-                We select the finest crops from Egypt’s most fertile lands, harvested at exactly the right moment.
+                {highlight ?? 'We select the finest crops from Egypt’s most fertile lands, harvested at exactly the right moment.'}
               </p>
             </div>
           </article>
 
-          <FeatureCard
-            icon="snowflake"
-            title="Advanced IQF"
-            text="Freshness, flavour and texture perfectly preserved."
-            className="bg-brand-50"
-          />
-          <FeatureCard
-            icon="shield"
-            title="Strict quality control"
-            text="Certified processes from farm to freezer."
-            className="bg-sand-100"
-          />
+          <FeatureCard icon={cards[0].icon} title={cards[0].title} text={cards[0].description} className="bg-brand-50" />
+          <FeatureCard icon={cards[1].icon} title={cards[1].title} text={cards[1].description} className="bg-sand-100" />
 
           <article className="flex flex-col justify-between gap-10 rounded-[2rem] bg-brand-900 p-8 text-white md:col-span-2">
             <div className="flex items-start justify-between gap-6">
               <div>
-                <h3 className="text-xl font-semibold">Global experience</h3>
-                <p className="mt-2 max-w-sm leading-relaxed text-white/65">
-                  A trusted exporter across four regions — and reaching new markets every season.
-                </p>
+                <h3 className="text-xl font-semibold">{cards[2].title}</h3>
+                <p className="mt-2 max-w-sm leading-relaxed text-white/65">{cards[2].description}</p>
               </div>
-              <Icon name="globe" size={40} className="shrink-0 text-brand-400" />
+              <Icon name={cards[2].icon} size={40} className="shrink-0 text-brand-400" />
             </div>
             <ul className="flex flex-wrap gap-2">
               {markets.map((market) => (

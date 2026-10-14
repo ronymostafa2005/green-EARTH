@@ -20,7 +20,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-export function ContactForm({ product }: { product?: string }) {
+export function ContactForm({ product, email = siteConfig.contact.email }: { product?: string; email?: string }) {
   const [state, formAction, pending] = useActionState(sendContactMessage, initialState);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -84,7 +84,7 @@ export function ContactForm({ product }: { product?: string }) {
         </button>
         {state.status === 'error' && (
           <p role="alert" className="text-sm text-red-600">
-            {state.message} You can also write to {siteConfig.contact.email}.
+            {state.message} You can also write to {email}.
           </p>
         )}
       </div>
