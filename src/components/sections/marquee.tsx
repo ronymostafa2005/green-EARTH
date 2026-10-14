@@ -1,9 +1,13 @@
 import { Icon } from '@/components/ui/icon';
 import { loadProductCatalog } from '@/lib/content';
 
+const HIGHLIGHTS = ['Premium IQF', 'Grown in Egypt', 'Frozen within hours', 'ISO 22000 certified', 'Shipped worldwide', 'Fruits & vegetables'];
+const MIN_ITEMS = 8;
+
 export async function Marquee() {
   const { products } = await loadProductCatalog();
-  const names = products.map((p) => p.name);
+  const base = products.length ? products.map((p) => p.name) : HIGHLIGHTS;
+  const names = Array.from({ length: Math.ceil(MIN_ITEMS / base.length) }, () => base).flat();
 
   return (
     <div aria-hidden className="overflow-hidden bg-brand-900 py-6 text-white">
