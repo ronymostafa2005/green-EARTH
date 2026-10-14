@@ -121,15 +121,21 @@ export function HeroCarousel({ slides, fallbackTitle, stats, badge }: HeroCarous
                     active ? 'z-10 scale-100 opacity-100 [clip-path:inset(0_0_0_0_round_2.5rem)]' : 'z-0 scale-[1.08] opacity-0 [clip-path:inset(6%_6%_6%_6%_round_2.5rem)]',
                   )}
                 >
-                  <Image
-                    src={s.image ?? POSTER}
-                    alt=""
-                    fill
-                    priority={i === 0}
-                    loading={i === 0 ? undefined : 'eager'}
-                    sizes="(min-width: 1024px) 45vw, 100vw"
-                    className={cn('object-cover', active && multi && !reducedMotion && 'animate-ken-burns')}
-                  />
+                  {s.image ? (
+                    <Image
+                      src={s.image}
+                      alt=""
+                      fill
+                      priority={i === 0}
+                      loading={i === 0 ? undefined : 'eager'}
+                      sizes="(min-width: 1024px) 45vw, 100vw"
+                      className={cn('object-cover', active && multi && !reducedMotion && 'animate-ken-burns')}
+                    />
+                  ) : (
+                    <video autoPlay muted loop playsInline preload="metadata" poster={POSTER} className="absolute inset-0 size-full scale-110 object-cover">
+                      <source src="/videos/hero.mp4" type="video/mp4" />
+                    </video>
+                  )}
                 </div>
               );
             })
@@ -160,7 +166,7 @@ export function HeroCarousel({ slides, fallbackTitle, stats, badge }: HeroCarous
                             i === index &&
                               (reducedMotion
                                 ? 'scale-x-100'
-                                : 'animate-progress group-hover/hero:[animation-play-state:paused] group-has-[:focus-visible]/hero:[animation-play-state:paused]'),
+                                : 'animate-progress group-has-[:focus-visible]/hero:[animation-play-state:paused]'),
                           )}
                           style={
                             i === index && !reducedMotion

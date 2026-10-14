@@ -1,10 +1,14 @@
 import { Icon } from '@/components/ui/icon';
 import { stats } from '@/data/company';
-import { getHeroSlides } from '@/lib/site-content';
+import { getHeroSlides, type HeroSlide } from '@/lib/site-content';
 import { HeroCarousel } from './hero-carousel';
 
+/** The built-in hero (default copy + video) always rotates after the dashboard banners. */
+const BRAND_SLIDE: HeroSlide = { id: 0, title: null, subtitle: null, image: null, buttonText: null, link: null };
+
 export async function Hero() {
-  const slides = await getHeroSlides();
+  const banners = await getHeroSlides();
+  const slides = banners.length ? [...banners, BRAND_SLIDE] : [];
 
   return (
     <section className="relative isolate overflow-hidden pt-10 pb-20 sm:pt-16 lg:pb-28">
