@@ -3,7 +3,7 @@ import { dictionaries, isLocale, isTheme, type Locale, type Theme } from './i18n
 
 export const TOKEN_COOKIE = 'gde_admin_token';
 export const USER_COOKIE = 'gde_admin_user';
-export const LOCALE_COOKIE = 'gde_admin_locale';
+export const LOCALE_COOKIE = 'gde_admin_lang';
 export const THEME_COOKIE = 'gde_admin_theme';
 
 export type AdminUser = { name: string; email: string; image?: string | null };
@@ -12,7 +12,7 @@ export async function getPrefs(): Promise<{ locale: Locale; theme: Theme }> {
   const store = await cookies();
   const locale = store.get(LOCALE_COOKIE)?.value;
   const theme = store.get(THEME_COOKIE)?.value;
-  return { locale: isLocale(locale) ? locale : 'ar', theme: isTheme(theme) ? theme : 'light' };
+  return { locale: isLocale(locale) ? locale : 'en', theme: isTheme(theme) ? theme : 'light' };
 }
 
 export async function getDictionary() {
