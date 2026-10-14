@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import { Instrument_Serif, Plus_Jakarta_Sans } from 'next/font/google';
-import { SiteFooter } from '@/components/layout/site-footer';
-import { SiteHeader } from '@/components/layout/site-header';
 import { siteConfig } from '@/config/site';
 import './globals.css';
 
@@ -34,11 +32,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${jakarta.variable} ${instrument.variable}`}>
-      <body>
-        <SiteHeader />
-        <main>{children}</main>
-        <SiteFooter />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

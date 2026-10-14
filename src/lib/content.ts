@@ -77,7 +77,7 @@ export type ProductCatalog = {
   products: Product[];
 };
 
-const slugify = (value: string) =>
+export const slugify = (value: string) =>
   value
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
