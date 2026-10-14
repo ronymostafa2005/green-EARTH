@@ -39,11 +39,13 @@ function VisibilityToggle({ productId, initial }: { productId: number; initial: 
     <div className="inline-flex items-center gap-2.5">
       <span
         className={cn(
-          'inline-flex w-[4.75rem] items-center gap-1.5 text-xs font-semibold',
-          shown ? 'text-brand-700 dark:text-brand-300' : 'text-stone-500 dark:text-stone-400',
+          'inline-flex min-w-[5.5rem] items-center justify-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset',
+          shown
+            ? 'bg-brand-50 text-brand-700 ring-brand-600/20 dark:bg-brand-500/10 dark:text-brand-300 dark:ring-brand-400/25'
+            : 'bg-stone-100 text-stone-600 ring-stone-300/60 dark:bg-white/5 dark:text-stone-400 dark:ring-white/10',
         )}
       >
-        <span className={cn('size-2 shrink-0 rounded-full', shown ? 'bg-brand-500 shadow-[0_0_0_3px] shadow-brand-500/20' : 'bg-stone-400 dark:bg-stone-500')} />
+        <span className={cn('size-2 shrink-0 rounded-full', shown ? 'animate-pulse bg-brand-500' : 'bg-stone-400 dark:bg-stone-500')} />
         {shown ? t.products.statusShown : t.products.statusHidden}
       </span>
       <button
@@ -160,7 +162,7 @@ export function ProductsTable({
         <EmptyState icon="search" title={t.common.noResults} />
       ) : (
         <div className={cn('overflow-x-auto rounded-3xl xl:overflow-visible', surface)}>
-          <table className="w-full min-w-[820px] text-sm">
+          <table className="w-full min-w-[840px] text-sm">
             <thead>
               <tr className="text-xs font-semibold text-brand-900/70 dark:text-stone-400">
                 {[
