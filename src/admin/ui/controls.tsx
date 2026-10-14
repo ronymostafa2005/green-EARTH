@@ -4,38 +4,9 @@ import { startTransition, useActionState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { AdminIcon, type AdminIconName } from './icon';
 import { useAdmin } from './provider';
+import { adminButton, inputStyles, surface } from './styles';
 
-const buttonVariants = {
-  primary: 'bg-brand-600 text-white shadow-sm hover:bg-brand-700 dark:bg-brand-500 dark:text-brand-950 dark:hover:bg-brand-400',
-  secondary:
-    'bg-white text-stone-700 ring-1 ring-stone-200 hover:bg-stone-50 dark:bg-white/5 dark:text-stone-200 dark:ring-white/10 dark:hover:bg-white/10',
-  ghost: 'text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-white/10',
-  danger: 'bg-red-600 text-white hover:bg-red-700',
-  dangerGhost: 'text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10',
-};
-
-const buttonSizes = {
-  sm: 'h-9 px-3 text-[13px]',
-  md: 'h-10 px-4 text-sm',
-  lg: 'h-12 px-5 text-sm',
-  icon: 'size-9',
-};
-
-export function adminButton({
-  variant = 'primary',
-  size = 'md',
-  className,
-}: { variant?: keyof typeof buttonVariants; size?: keyof typeof buttonSizes; className?: string } = {}) {
-  return cn(
-    'inline-flex shrink-0 items-center justify-center gap-2 rounded-xl font-semibold whitespace-nowrap transition-colors duration-150 disabled:pointer-events-none disabled:opacity-55 [&_svg]:shrink-0',
-    buttonVariants[variant],
-    buttonSizes[size],
-    className,
-  );
-}
-
-export const inputStyles =
-  'w-full rounded-xl border border-stone-200 bg-white px-3.5 py-2.5 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 disabled:opacity-60 dark:border-white/10 dark:bg-white/[0.04] dark:text-stone-100 dark:placeholder:text-stone-500';
+export { adminButton, inputStyles, surface };
 
 export function Spinner({ className }: { className?: string }) {
   return <AdminIcon name="spinner" className={cn('animate-spin', className)} />;
@@ -128,13 +99,13 @@ export function Dialog({
       onClose={onClose}
       onClick={(e) => e.target === e.currentTarget && onClose()}
       className={cn(
-        'm-auto w-[calc(100%-2rem)] rounded-3xl bg-white p-0 text-stone-900 shadow-2xl ring-1 ring-stone-200 backdrop:bg-stone-950/50 backdrop:backdrop-blur-sm open:animate-fade-in dark:bg-stone-900 dark:text-stone-100 dark:ring-white/10',
+        'm-auto w-[calc(100%-2rem)] rounded-3xl bg-white p-0 text-stone-900 shadow-2xl ring-1 ring-brand-950/10 backdrop:bg-brand-950/40 backdrop:backdrop-blur-sm open:animate-fade-in dark:bg-[#171a14] dark:text-stone-100 dark:ring-white/10',
         { sm: 'max-w-md', md: 'max-w-2xl', lg: 'max-w-4xl' }[size],
       )}
     >
       {open && (
         <div className="max-h-[85vh] overflow-y-auto">
-          <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-stone-100 bg-white/90 px-6 py-5 backdrop-blur dark:border-white/5 dark:bg-stone-900/90">
+          <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-stone-100 bg-white/90 px-6 py-5 backdrop-blur dark:border-white/5 dark:bg-[#171a14]/90">
             <div>
               <h2 className="text-lg font-semibold">{title}</h2>
               {description && <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">{description}</p>}
@@ -189,7 +160,7 @@ export function ConfirmDialog({
 
 export function EmptyState({ icon, title, text, action }: { icon: AdminIconName; title: string; text?: string; action?: React.ReactNode }) {
   return (
-    <div className="grid place-items-center rounded-3xl border border-dashed border-stone-300 px-6 py-16 text-center dark:border-white/10">
+    <div className="grid place-items-center rounded-3xl border-2 border-dashed border-brand-900/10 bg-white/50 px-6 py-16 text-center dark:border-white/10 dark:bg-white/[0.02]">
       <span className="grid size-14 place-items-center rounded-2xl bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
         <AdminIcon name={icon} size={24} />
       </span>

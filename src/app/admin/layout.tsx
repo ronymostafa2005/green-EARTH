@@ -27,7 +27,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         arabic.variable,
         theme === 'dark' && 'dark',
         locale === 'ar' && 'font-[family-name:var(--font-arabic)]',
-        'min-h-screen bg-stone-100 text-stone-900 dark:bg-stone-950 dark:text-stone-100',
+        'min-h-screen bg-[#eef1e8] text-stone-900 dark:bg-[#0d0f0b] dark:text-stone-100',
       )}
     >
       <AdminProvider locale={locale} theme={theme}>

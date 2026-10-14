@@ -1,11 +1,14 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { unstable_rethrow } from 'next/navigation';
 import { countOf, listPage } from '@/admin/api';
 import { formatDate, toMessage } from '@/admin/messages';
 import { getDictionary, getPrefs, getUser } from '@/admin/session';
 import { AdminIcon, type AdminIconName } from '@/admin/ui/icon';
-import { Card, CardTitle, PageHeader } from '@/admin/ui/page-header';
+import { Card, CardTitle } from '@/admin/ui/page-header';
+import { adminButton, surface } from '@/admin/ui/styles';
+import { cn } from '@/lib/utils';
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getDictionary()).nav.overview };
@@ -20,6 +23,14 @@ const settled = async <T,>(promise: Promise<T>) => {
   }
 };
 
+const tones = {
+  green: { icon: 'bg-brand-100 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300', glow: 'bg-brand-400' },
+  amber: { icon: 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300', glow: 'bg-amber-400' },
+  sky: { icon: 'bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300', glow: 'bg-sky-400' },
+  violet: { icon: 'bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300', glow: 'bg-violet-400' },
+  rose: { icon: 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300', glow: 'bg-rose-400' },
+};
+
 export default async function OverviewPage() {
   const [t, { locale }, user] = await Promise.all([getDictionary(), getPrefs(), getUser()]);
 
@@ -31,39 +42,64 @@ export default async function OverviewPage() {
     settled(listPage('ContactUs', { pageNumber: 1, pageSize: 5 })),
   ]);
 
-  const stats: { label: string; value: number | null; href: string; icon: AdminIconName }[] = [
-    { label: t.nav.products, value: products, href: '/admin/products', icon: 'box' },
-    { label: t.nav.categories, value: categories, href: '/admin/categories', icon: 'tag' },
-    { label: t.nav.certifications, value: certifications, href: '/admin/certifications', icon: 'award' },
-    { label: t.nav.exhibitions, value: exhibitions, href: '/admin/exhibitions', icon: 'calendar' },
-    { label: t.nav.messages, value: messages?.totalCount ?? null, href: '/admin/messages', icon: 'inbox' },
+  const stats: { label: string; value: number | null; href: string; icon: AdminIconName; tone: keyof typeof tones }[] = [
+    { label: t.nav.products, value: products, href: '/admin/products', icon: 'box', tone: 'green' },
+    { label: t.nav.categories, value: categories, href: '/admin/categories', icon: 'tag', tone: 'amber' },
+    { label: t.nav.certifications, value: certifications, href: '/admin/certifications', icon: 'award', tone: 'sky' },
+    { label: t.nav.exhibitions, value: exhibitions, href: '/admin/exhibitions', icon: 'calendar', tone: 'violet' },
+    { label: t.nav.messages, value: messages?.totalCount ?? null, href: '/admin/messages', icon: 'inbox', tone: 'rose' },
   ];
 
-  const quickActions: { label: string; href: string; icon: AdminIconName }[] = [
-    { label: t.overview.addProduct, href: '/admin/products/new', icon: 'box' },
-    { label: t.overview.addCertification, href: '/admin/certifications', icon: 'award' },
-    { label: t.overview.addExhibition, href: '/admin/exhibitions', icon: 'calendar' },
+  const quickActions: { label: string; href: string; icon: AdminIconName; tone: keyof typeof tones }[] = [
+    { label: t.overview.addProduct, href: '/admin/products/new', icon: 'box', tone: 'green' },
+    { label: t.overview.addCertification, href: '/admin/certifications', icon: 'award', tone: 'sky' },
+    { label: t.overview.addExhibition, href: '/admin/exhibitions', icon: 'calendar', tone: 'violet' },
   ];
 
   const recent = (messages?.data ?? []).map(toMessage);
+  const today = new Intl.DateTimeFormat(locale === 'ar' ? 'ar-EG' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
+  const greeting = user?.name ? `${t.overview.greeting}${locale === 'ar' ? '، ' : ', '}${user.name}` : t.overview.greeting;
 
   return (
     <>
-      <PageHeader title={user?.name ? `${t.overview.greeting}${locale === 'ar' ? '، ' : ', '}${user.name}` : t.overview.greeting} description={t.overview.subtitle} />
+      <section className="relative isolate overflow-hidden rounded-[2rem] bg-brand-950 px-6 py-9 text-white shadow-[0_24px_60px_-28px_rgb(19_33_13/0.7)] sm:px-10 sm:py-11">
+        <Image src="/images/pages/header.jpg" alt="" fill priority sizes="(min-width: 1024px) 75vw, 100vw" className="-z-20 object-cover opacity-45" />
+        <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-r from-brand-950 via-brand-950/80 to-brand-950/10 rtl:bg-gradient-to-l" />
+        <p className="flex items-center gap-2 text-sm text-brand-200">
+          <AdminIcon name="leaf" size={16} />
+          {today}
+        </p>
+        <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">{greeting}</h1>
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/70 sm:text-base">{t.overview.subtitle}</p>
+        <div className="mt-7 flex flex-wrap gap-2">
+          <Link href="/admin/products/new" className={adminButton({ className: 'bg-white text-brand-900 hover:bg-brand-50 dark:bg-white dark:text-brand-900 dark:hover:bg-brand-50' })}>
+            <AdminIcon name="plus" />
+            {t.overview.addProduct}
+          </Link>
+          <a href="/" target="_blank" rel="noreferrer" className={adminButton({ variant: 'ghost', className: 'text-white ring-1 ring-white/25 hover:bg-white/10 dark:text-white' })}>
+            <AdminIcon name="external" size={16} />
+            {t.common.viewSite}
+          </a>
+        </div>
+      </section>
 
-      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {stats.map((stat) => (
           <li key={stat.href}>
             <Link
               href={stat.href}
-              className="group flex h-full flex-col justify-between gap-6 rounded-3xl bg-white p-5 ring-1 ring-stone-200/70 transition hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-24px_rgb(0_0_0/0.3)] dark:bg-stone-900 dark:ring-white/[0.06]"
+              className={cn('group relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-3xl p-5 transition duration-300 hover:-translate-y-1', surface)}
             >
-              <span className="grid size-11 place-items-center rounded-2xl bg-brand-50 text-brand-700 transition group-hover:bg-brand-600 group-hover:text-white dark:bg-brand-500/10 dark:text-brand-300">
-                <AdminIcon name={stat.icon} size={20} />
+              <span aria-hidden className={cn('absolute -end-8 -top-8 size-24 rounded-full opacity-[0.15] blur-2xl transition-opacity group-hover:opacity-30', tones[stat.tone].glow)} />
+              <span className="flex items-center justify-between">
+                <span className={cn('grid size-11 place-items-center rounded-2xl', tones[stat.tone].icon)}>
+                  <AdminIcon name={stat.icon} size={20} />
+                </span>
+                <AdminIcon name="chevron" size={16} className="text-stone-300 transition group-hover:translate-x-0.5 group-hover:text-stone-500 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5 dark:text-stone-600" />
               </span>
               <span>
-                <span className="block text-3xl font-bold tracking-tight tabular-nums">{stat.value ?? '—'}</span>
-                <span className="mt-1 block text-sm text-stone-500 dark:text-stone-400">{stat.label}</span>
+                <span className="block text-3xl font-bold tracking-tight text-brand-950 tabular-nums dark:text-white">{stat.value ?? '—'}</span>
+                <span className="mt-1 block text-sm font-medium text-stone-500 dark:text-stone-400">{stat.label}</span>
               </span>
             </Link>
           </li>
@@ -81,21 +117,28 @@ export default async function OverviewPage() {
             }
           />
           {recent.length === 0 ? (
-            <p className="py-8 text-center text-sm text-stone-500 dark:text-stone-400">{t.messages.empty}</p>
+            <div className="grid place-items-center rounded-2xl bg-brand-50/50 py-10 text-center dark:bg-white/[0.02]">
+              <span className={cn('grid size-12 place-items-center rounded-2xl', tones.rose.icon)}>
+                <AdminIcon name="inbox" size={22} />
+              </span>
+              <p className="mt-3 text-sm text-stone-500 dark:text-stone-400">{t.messages.empty}</p>
+            </div>
           ) : (
-            <ul className="-mx-2 divide-y divide-stone-100 dark:divide-white/5">
+            <ul className="-mx-2 grid gap-1">
               {recent.map((m) => (
-                <li key={m.id} className="flex items-start gap-3 px-2 py-3">
-                  <span className="grid size-9 shrink-0 place-items-center rounded-full bg-brand-100 text-sm font-bold text-brand-800 uppercase dark:bg-brand-500/15 dark:text-brand-200">
-                    {(m.name || m.email).charAt(0)}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="flex items-baseline justify-between gap-3">
-                      <span className="truncate text-sm font-semibold">{m.name || m.email}</span>
-                      {formatDate(m.date, locale) && <span className="shrink-0 text-xs text-stone-400">{formatDate(m.date, locale)}</span>}
-                    </p>
-                    <p className="truncate text-sm text-stone-500 dark:text-stone-400">{m.subject || m.message}</p>
-                  </div>
+                <li key={m.id}>
+                  <Link href="/admin/messages" className="flex items-start gap-3 rounded-2xl px-2 py-3 transition hover:bg-brand-50/60 dark:hover:bg-white/[0.03]">
+                    <span className="grid size-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-brand-400 to-brand-700 text-sm font-bold text-white uppercase">
+                      {(m.name || m.email).charAt(0)}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-baseline justify-between gap-3">
+                        <span className="truncate text-sm font-semibold">{m.name || m.email}</span>
+                        {formatDate(m.date, locale) && <span className="shrink-0 text-xs text-stone-400">{formatDate(m.date, locale)}</span>}
+                      </span>
+                      <span className="block truncate text-sm text-stone-500 dark:text-stone-400">{m.subject || m.message}</span>
+                    </span>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -104,18 +147,20 @@ export default async function OverviewPage() {
 
         <Card>
           <CardTitle title={t.overview.quickActions} />
-          <ul className="grid gap-2">
+          <ul className="grid gap-2.5">
             {quickActions.map((action) => (
               <li key={action.label}>
                 <Link
                   href={action.href}
-                  className="flex items-center gap-3 rounded-2xl p-3 ring-1 ring-stone-200/70 transition hover:bg-stone-50 hover:ring-stone-300 dark:ring-white/[0.06] dark:hover:bg-white/[0.03]"
+                  className="group flex items-center gap-3 rounded-2xl bg-stone-50/80 p-3 ring-1 ring-transparent transition hover:bg-white hover:ring-brand-500/25 hover:shadow-sm dark:bg-white/[0.03] dark:hover:bg-white/[0.06]"
                 >
-                  <span className="grid size-10 place-items-center rounded-xl bg-stone-100 text-stone-700 dark:bg-white/5 dark:text-stone-300">
+                  <span className={cn('grid size-10 place-items-center rounded-xl', tones[action.tone].icon)}>
                     <AdminIcon name={action.icon} />
                   </span>
                   <span className="flex-1 text-sm font-semibold">{action.label}</span>
-                  <AdminIcon name="plus" size={16} className="text-stone-400" />
+                  <span className="grid size-8 place-items-center rounded-full bg-white text-stone-400 shadow-sm transition group-hover:bg-brand-600 group-hover:text-white dark:bg-white/5">
+                    <AdminIcon name="plus" size={16} />
+                  </span>
                 </Link>
               </li>
             ))}

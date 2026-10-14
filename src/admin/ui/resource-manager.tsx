@@ -4,7 +4,7 @@ import { useMemo, useState, useTransition } from 'react';
 import { cn } from '@/lib/utils';
 import { deleteResource, saveResource } from '../actions';
 import { resources, rowName, type ResourceKey, type Row } from '../resources';
-import { adminButton, BilingualField, ConfirmDialog, Dialog, EmptyState, Field, inputStyles, SearchInput, Spinner, useFormSubmit, useResultToast } from './controls';
+import { adminButton, BilingualField, ConfirmDialog, Dialog, EmptyState, Field, inputStyles, SearchInput, Spinner, surface, useFormSubmit, useResultToast } from './controls';
 import { AdminIcon } from './icon';
 import { ImageInput } from './image-inputs';
 import { useAdmin } from './provider';
@@ -125,8 +125,8 @@ export function ResourceManager({ resourceKey, rows }: { resourceKey: ResourceKe
       ) : config.view === 'grid' ? (
         <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.map((row) => (
-            <li key={row.id} className="group overflow-hidden rounded-3xl bg-white ring-1 ring-stone-200/70 transition hover:shadow-[0_20px_40px_-24px_rgb(0_0_0/0.3)] dark:bg-stone-900 dark:ring-white/[0.06]">
-              <div className="relative aspect-[16/10] bg-stone-50 dark:bg-white/[0.03]">
+            <li key={row.id} className={cn('group overflow-hidden rounded-3xl transition duration-300 hover:-translate-y-1 hover:ring-brand-500/25', surface)}>
+              <div className="relative m-2 mb-0 aspect-[16/10] overflow-hidden rounded-[1.25rem] bg-gradient-to-br from-brand-50 via-[#f6f4ec] to-sand-100/70 dark:from-white/[0.05] dark:via-white/[0.03] dark:to-white/[0.02]">
                 {row.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={row.imageUrl} alt="" loading="lazy" className="size-full object-contain p-6" />
@@ -147,9 +147,9 @@ export function ResourceManager({ resourceKey, rows }: { resourceKey: ResourceKe
           ))}
         </ul>
       ) : (
-        <div className="overflow-hidden rounded-3xl bg-white ring-1 ring-stone-200/70 dark:bg-stone-900 dark:ring-white/[0.06]">
+        <div className={cn('overflow-hidden rounded-3xl', surface)}>
           <table className="w-full text-sm">
-            <thead className="bg-stone-50 text-start text-xs font-semibold text-stone-500 dark:bg-white/[0.03] dark:text-stone-400">
+            <thead className="bg-brand-50/60 text-start text-xs font-semibold text-brand-900/60 dark:bg-white/[0.03] dark:text-stone-400">
               <tr>
                 <th className="px-5 py-3 text-start">{t.fields.name} · {t.common.english}</th>
                 <th className="px-5 py-3 text-start">{t.fields.name} · {t.common.arabic}</th>
@@ -159,7 +159,7 @@ export function ResourceManager({ resourceKey, rows }: { resourceKey: ResourceKe
             </thead>
             <tbody className="divide-y divide-stone-100 dark:divide-white/5">
               {filtered.map((row) => (
-                <tr key={row.id} className="transition-colors hover:bg-stone-50/70 dark:hover:bg-white/[0.02]">
+                <tr key={row.id} className="transition-colors hover:bg-brand-50/40 dark:hover:bg-white/[0.02]">
                   <td className="px-5 py-3.5 font-medium" dir="ltr">
                     <span className={cn(locale === 'ar' && 'block text-end')}>{str(row.name) || '—'}</span>
                   </td>

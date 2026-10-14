@@ -102,8 +102,10 @@ export async function signIn(_prev: ActionResult, formData: FormData): Promise<A
     const json = (await res.json().catch(() => null)) as { succeeded?: boolean; message?: string; data?: unknown } | null;
 
     if (!res.ok || !json?.succeeded) {
-      const known = [400, 401, 403, 404].includes(res.status);
-      return { ok: false, message: known ? dict.auth.invalid : (json?.message ?? dict.common.error), at: Date.now() };
+      console.warn(`[admin] sign in rejected: ${res.status} ${json?.message ?? ''}`);
+      const message =
+        res.status === 404 ? dict.auth.notFound : [400, 401, 403].includes(res.status) ? dict.auth.invalid : (json?.message ?? dict.common.error);
+      return { ok: false, message, at: Date.now() };
     }
     ({ token, user } = readSignIn(json.data, email));
   } catch (error) {

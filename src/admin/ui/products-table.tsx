@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState, useTransition } from 'react';
 import { cn } from '@/lib/utils';
 import { deleteProduct } from '../actions';
 import type { Option } from '../products';
-import { adminButton, ConfirmDialog, EmptyState, SearchInput } from './controls';
+import { adminButton, ConfirmDialog, EmptyState, SearchInput, surface } from './controls';
 import { AdminIcon } from './icon';
 import { useAdmin } from './provider';
 
@@ -80,7 +80,7 @@ export function ProductsTable({ products, categories, created }: { products: Pro
       <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <SearchInput value={query} onChange={setQuery} />
         <div className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] lg:mx-0 lg:px-0">
-          <div role="tablist" className="inline-flex gap-1 rounded-xl bg-white p-1 ring-1 ring-stone-200/70 dark:bg-stone-900 dark:ring-white/[0.06]">
+          <div role="tablist" className={cn('inline-flex gap-1 rounded-2xl p-1.5', surface)}>
             {filters.map((f) => (
               <button
                 key={f.id}
@@ -89,10 +89,10 @@ export function ProductsTable({ products, categories, created }: { products: Pro
                 aria-selected={category === f.id}
                 onClick={() => setCategory(f.id)}
                 className={cn(
-                  'rounded-lg px-3.5 py-1.5 text-[13px] font-semibold whitespace-nowrap transition-colors',
+                  'rounded-xl px-4 py-1.5 text-[13px] font-semibold whitespace-nowrap transition-colors',
                   category === f.id
-                    ? 'bg-stone-900 text-white dark:bg-white dark:text-stone-900'
-                    : 'text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-white',
+                    ? 'bg-brand-600 text-white shadow-sm dark:bg-brand-500 dark:text-brand-950'
+                    : 'text-stone-500 hover:bg-brand-50 hover:text-brand-800 dark:text-stone-400 dark:hover:bg-white/5 dark:hover:text-white',
                 )}
               >
                 {f.label}
@@ -109,10 +109,10 @@ export function ProductsTable({ products, categories, created }: { products: Pro
           {filtered.map((p) => (
             <li
               key={p.id}
-              className="flex items-center gap-4 rounded-2xl bg-white p-3 pe-4 ring-1 ring-stone-200/70 transition hover:ring-stone-300 dark:bg-stone-900 dark:ring-white/[0.06] dark:hover:ring-white/15"
+              className={cn('flex items-center gap-4 rounded-2xl p-3 pe-4 transition hover:-translate-y-px hover:ring-brand-500/30 dark:hover:ring-white/15', surface)}
             >
               <Link href={`/admin/products/${p.id}`} className="flex min-w-0 flex-1 items-center gap-4">
-                <span className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-stone-50 ring-1 ring-stone-100 dark:bg-white/5 dark:ring-white/5">
+                <span className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-brand-50 to-sand-100/70 dark:from-white/5 dark:to-white/[0.02]">
                   {p.thumbnail ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={p.thumbnail} alt="" loading="lazy" className="size-full object-contain p-1.5" />

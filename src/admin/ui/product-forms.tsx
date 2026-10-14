@@ -31,7 +31,7 @@ export function CategorySelect({ categories, defaultValue }: { categories: Optio
 function SaveBar({ pending, label, cancelHref }: { pending: boolean; label: string; cancelHref?: string }) {
   const { t } = useAdmin();
   return (
-    <div className="sticky bottom-4 z-10 flex justify-end gap-2 rounded-2xl bg-white/85 p-3 shadow-[0_12px_40px_-12px_rgb(0_0_0/0.25)] ring-1 ring-stone-200/70 backdrop-blur-xl dark:bg-stone-900/85 dark:ring-white/10">
+    <div className="sticky bottom-4 z-10 flex justify-end gap-2 rounded-2xl bg-white/85 p-3 shadow-[0_12px_40px_-12px_rgb(0_0_0/0.25)] ring-1 ring-brand-950/10 backdrop-blur-xl dark:bg-[#171a14]/85 dark:ring-white/10">
       {cancelHref && (
         <Link href={cancelHref} className={adminButton({ variant: 'secondary' })}>
           {t.common.cancel}

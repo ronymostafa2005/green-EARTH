@@ -37,7 +37,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         </div>
       </aside>
 
-      <main className="relative flex flex-col bg-white dark:bg-stone-900">
+      <main className="relative flex flex-col bg-[#f7f8f3] dark:bg-[#121410]">
         <div className="flex items-center justify-between p-5 sm:p-8">
           <span className="flex items-center gap-2 lg:invisible">
             <Image src="/images/logo.png" alt="" width={32} height={32} />

@@ -6,7 +6,7 @@ import { useState, useTransition } from 'react';
 import { cn } from '@/lib/utils';
 import { deleteMessage } from '../actions';
 import { formatDate } from '../messages';
-import { adminButton, ConfirmDialog, Dialog, EmptyState, inputStyles } from './controls';
+import { adminButton, ConfirmDialog, Dialog, EmptyState, inputStyles, surface } from './controls';
 import { AdminIcon } from './icon';
 import { useAdmin } from './provider';
 
@@ -66,7 +66,7 @@ export function MessagesInbox({
       {messages.length === 0 ? (
         <EmptyState icon="inbox" title={query ? t.common.noResults : t.messages.empty} text={query ? undefined : t.messages.emptyText} />
       ) : (
-        <ul className="divide-y divide-stone-100 overflow-hidden rounded-3xl bg-white ring-1 ring-stone-200/70 dark:divide-white/5 dark:bg-stone-900 dark:ring-white/[0.06]">
+        <ul className={cn('divide-y divide-stone-100 overflow-hidden rounded-3xl dark:divide-white/5', surface)}>
           {messages.map((m) => (
             <li key={m.id}>
               <button type="button" onClick={() => setOpen(m)} className="flex w-full items-start gap-4 px-5 py-4 text-start transition-colors hover:bg-stone-50 dark:hover:bg-white/[0.03]">

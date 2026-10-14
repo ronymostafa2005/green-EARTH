@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { getById, listAll, tryListAll } from '@/admin/api';
 import { loadHarvestLinks, loadProductLinks, productImages, productSlug, toOptions, type ProductDetail } from '@/admin/products';
 import { getDictionary } from '@/admin/session';
-import { adminButton } from '@/admin/ui/controls';
+import { adminButton } from '@/admin/ui/styles';
 import { AdminIcon } from '@/admin/ui/icon';
 import { PageHeader } from '@/admin/ui/page-header';
 import { ProductBasicsForm } from '@/admin/ui/product-forms';

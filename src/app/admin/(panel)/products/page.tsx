@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { listAll } from '@/admin/api';
 import { productImages, productSlug, toOptions, type ProductDetail } from '@/admin/products';
 import { getDictionary } from '@/admin/session';
-import { adminButton } from '@/admin/ui/controls';
+import { adminButton } from '@/admin/ui/styles';
 import { AdminIcon } from '@/admin/ui/icon';
 import { PageHeader } from '@/admin/ui/page-header';
 import { ProductsTable } from '@/admin/ui/products-table';
